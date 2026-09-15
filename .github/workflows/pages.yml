@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - cursor/y2k-grunge-profile-8232
+      - cursor/github-pages-preview-8232
   workflow_dispatch:
 
 permissions:

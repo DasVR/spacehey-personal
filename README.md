@@ -40,10 +40,15 @@ npm run build:pages
 ```
 
 The github.io artifact omits `CNAME`, so the preview stays on github.io
-instead of jumping to `p.dasdev.net`. If the first Pages deploy asks you
-to enable GitHub Pages, set Source to **GitHub Actions** in the repo
-settings. The repo is private, so the preview is visible to people with
-repo access (GitHub Pro/Team Pages on private repos).
+instead of jumping to `p.dasdev.net`. **Pages is not on yet** — the first
+deploy failed with 404 until Pages is enabled:
+
+1. Open [Settings → Pages](https://github.com/DasVR/spacehey-personal/settings/pages)
+2. Set Source to **GitHub Actions**
+3. Re-run the `pages` workflow (or push again)
+
+The repo is private. GitHub Pages on a private repo needs GitHub Pro/Team,
+or make the repo public, or the preview is only visible to collaborators.
 
 ## Casual / pro
 
