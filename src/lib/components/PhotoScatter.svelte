@@ -65,12 +65,12 @@
     overflow: visible;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    padding: var(--s-4);
+    padding: var(--s-4) var(--s-4) 2.25rem;
   }
 
   .stage {
     position: relative;
-    height: 38rem;
+    height: 36rem;
     perspective: 900px;
     overflow: visible;
   }

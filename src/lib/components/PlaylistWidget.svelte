@@ -54,6 +54,7 @@
 <style>
   .player {
     position: relative;
+    z-index: 6;
     overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
