@@ -2,6 +2,7 @@
   import GrainLayer from './GrainLayer.svelte';
   import { randomRotate } from '$lib/utils/randomRotate';
   import type { Friend } from '$lib/data/types';
+  import { assetUrl } from '$lib/utils/urls';
 
   interface Props {
     friends: Friend[];
@@ -17,7 +18,7 @@
   <ul>
     {#each friends as friend, index (friend.id)}
       <li style:transform={randomRotate(index + 2)}>
-        <img src={friend.src} alt="" />
+        <img src={assetUrl(friend.src)} alt="" />
         <p class="name">{friend.name}</p>
         <p class="cap">{friend.caption}</p>
       </li>

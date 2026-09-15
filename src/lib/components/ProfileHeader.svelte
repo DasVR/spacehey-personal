@@ -2,6 +2,7 @@
   import GrainLayer from './GrainLayer.svelte';
   import { profileState } from '$lib/profile.svelte.ts';
   import type { Tag } from '$lib/data/types';
+  import { assetUrl } from '$lib/utils/urls';
 
   interface Props {
     src: string;
@@ -19,7 +20,7 @@
 <section class="header torn-edge">
   <GrainLayer />
   <div class="polaroid">
-    <img {src} {alt} />
+    <img src={assetUrl(src)} {alt} />
   </div>
   <div class="meta">
     <p class="handle">:{username}:</p>
