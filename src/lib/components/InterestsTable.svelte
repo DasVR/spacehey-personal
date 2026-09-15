@@ -47,7 +47,7 @@
   }
 
   th {
-    width: 7.2rem;
+    width: 8.5rem;
     background: var(--color-accent);
     color: var(--color-ink);
     font-weight: 700;

@@ -31,7 +31,6 @@
         tags={data.tags}
       />
       <ContactButtons actions={data.contacts} />
-      <InterestsTable rows={data.interests} />
     </div>
     <div class="col-right stack">
       <Blurb
@@ -51,6 +50,7 @@
   </div>
 
   <div class="stack rest">
+    <InterestsTable rows={data.interests} />
     <PhotoScatter photos={data.photos} />
     <PlaylistWidget
       title={data.playlist.title}

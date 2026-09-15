@@ -70,7 +70,7 @@
 
   .stage {
     position: relative;
-    height: 28rem;
+    height: 38rem;
     perspective: 900px;
     overflow: visible;
   }

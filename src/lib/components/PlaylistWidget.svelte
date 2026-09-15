@@ -16,11 +16,9 @@
     selectedId ?? tracks.find((track) => track.playing)?.id ?? tracks[0]?.id,
   );
   const active = $derived(tracks.find((track) => track.id === activeId) ?? tracks[0]);
-  let audioEl: HTMLAudioElement | undefined = $state();
 
   function select(id: string): void {
     selectedId = id;
-    audioEl?.pause();
   }
 </script>
 
@@ -46,7 +44,6 @@
           </li>
         {/each}
       </ol>
-      <audio bind:this={audioEl} controls preload="none" aria-label="Track preview"></audio>
       <p class="hint">
         {active.title} — audio hookup later (Spotify / Apple Music / a real file). The row is live; the speakers are not.
       </p>
@@ -133,12 +130,6 @@
   .playing-dot.live {
     opacity: 1;
     animation: playing-pulse 2.8s ease-in-out infinite;
-  }
-
-  audio {
-    width: 100%;
-    height: 2rem;
-    opacity: 0.7;
   }
 
   .hint {
