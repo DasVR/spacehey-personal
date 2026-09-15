@@ -1,6 +1,7 @@
 <script lang="ts">
   import GrainLayer from './GrainLayer.svelte';
   import type { Track } from '$lib/data/types';
+  import { assetUrl } from '$lib/utils/urls';
 
   interface Props {
     title: string;
@@ -27,7 +28,7 @@
   <h2 class="section-title">Now Playing</h2>
   <div class="body">
     <div class="art">
-      <img src={art} alt="{title} cover art" />
+      <img src={assetUrl(art)} alt="{title} cover art" />
     </div>
     <div class="list">
       <p class="eyebrow">{artist}</p>

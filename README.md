@@ -26,6 +26,25 @@ npm run build
 Static output lands in `build/`. Point the `p.dasdev.net` host at that
 directory (`static/CNAME` is already set).
 
+### GitHub Pages preview
+
+Pushes to this branch (and to `main`) deploy a project-page preview:
+
+**https://dasvr.github.io/spacehey-personal/**
+
+That build sets `BASE_PATH=/spacehey-personal` so assets and nav work under
+the repo subpath. Local equivalent:
+
+```bash
+npm run build:pages
+```
+
+The github.io artifact omits `CNAME`, so the preview stays on github.io
+instead of jumping to `p.dasdev.net`. If the first Pages deploy asks you
+to enable GitHub Pages, set Source to **GitHub Actions** in the repo
+settings. The repo is private, so the preview is visible to people with
+repo access (GitHub Pro/Team Pages on private repos).
+
 ## Casual / pro
 
 The toggle in the nav writes `data-theme="casual" | "pro"` on `<html>`.

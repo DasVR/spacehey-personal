@@ -2,6 +2,7 @@
   import GrainLayer from './GrainLayer.svelte';
   import { rotateDeg } from '$lib/utils/randomRotate';
   import type { Photo } from '$lib/data/types';
+  import { assetUrl } from '$lib/utils/urls';
 
   interface Props {
     photos: Photo[];
@@ -51,7 +52,7 @@
           style:z-index={photo.z}
           style:transform={rotateDeg(photo.rotate)}
         >
-          <img src={photo.src} alt={photo.alt} />
+          <img src={assetUrl(photo.src)} alt={photo.alt} />
           <figcaption>{String(index + 1).padStart(2, '0')}</figcaption>
         </figure>
       {/each}
