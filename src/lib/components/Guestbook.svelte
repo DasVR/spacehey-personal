@@ -154,7 +154,7 @@
   }
 
   strong {
-    color: var(--color-ink);
+    color: var(--color-on-void);
   }
 
   time {

@@ -39,7 +39,7 @@
 
   button {
     background: var(--color-void);
-    color: var(--color-ink);
+    color: var(--color-on-void);
     border: 1px solid var(--color-void);
     box-shadow: 1px 1px 0 var(--color-void);
     padding: 8px 6px;

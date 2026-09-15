@@ -122,7 +122,7 @@
     font-size: 14px;
     margin: 0 0 6px;
     text-transform: lowercase;
-    color: var(--color-ink);
+    color: var(--color-on-void);
   }
 
   .card p:last-child {

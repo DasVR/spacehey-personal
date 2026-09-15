@@ -45,7 +45,7 @@
   th {
     width: 8rem;
     background: var(--color-void);
-    color: var(--color-ink);
+    color: var(--color-on-void);
     font-weight: 700;
     text-align: left;
   }

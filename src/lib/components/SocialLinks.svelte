@@ -50,7 +50,7 @@
     gap: 4px;
     padding: 0.65rem 0.25rem;
     background: var(--color-void);
-    color: var(--color-ink);
+    color: var(--color-on-void);
     border: 1px solid var(--color-panel-ink);
     text-decoration: none;
     transition:
@@ -61,7 +61,7 @@
   .tile:hover {
     transform: translateY(-3px);
     border-color: var(--color-red);
-    color: var(--color-ink);
+    color: var(--color-on-void);
   }
 
   .tile:active {
@@ -86,11 +86,13 @@
 
   .label {
     font-size: 8px;
-    color: var(--color-ink-dim);
+    color: var(--color-on-void);
+    opacity: 0.72;
     text-transform: lowercase;
   }
 
   .accent .label {
     color: color-mix(in srgb, var(--color-on-red) 80%, transparent);
+    opacity: 1;
   }
 </style>

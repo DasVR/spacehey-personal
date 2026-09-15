@@ -103,7 +103,7 @@ h1, h2, h3, p {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-ink-dim);
+  color: var(--color-panel-ink-dim);
   margin: 0 0 10px;
 }
 

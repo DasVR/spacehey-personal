@@ -15,6 +15,7 @@
   --color-on-red: #ffffff;
   --color-paper: #d8d2c4;
   --color-void: #000000;
+  --color-on-void: #e8e4dc;
   --color-star: #ffffff;
   --color-glitch-r: #ff2d55;
   --color-glitch-c: #2de0ff;
@@ -82,7 +83,8 @@
   --color-red: #b0212f;
   --color-on-red: #ffffff;
   --color-paper: #fffcf7;
-  --color-void: #1c1914;
+  --color-void: #000000;
+  --color-on-void: #fffcf7;
   --color-glitch-r: transparent;
   --color-glitch-c: transparent;
   --color-halo: color-mix(in srgb, var(--color-ink) 40%, transparent);
