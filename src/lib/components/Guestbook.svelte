@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import { profileState } from '$lib/profile.svelte.ts';
   import type { GuestbookEntry } from '$lib/data/types';
 
@@ -22,7 +21,6 @@
 </script>
 
 <section class="book">
-  <GrainLayer />
   <h2 class="section-title">Guestbook</h2>
   <form onsubmit={submit}>
     <label>
@@ -45,7 +43,7 @@
 </section>
 
 {#snippet entryBlock(entry: GuestbookEntry, depth: number)}
-  <article class="entry" style:margin-left="{depth * 1.25}rem">
+  <article class="entry" class:reply={depth > 0}>
     <header>
       <strong>{entry.author}</strong>
       <time>{entry.date}</time>
@@ -65,8 +63,6 @@
 
 <style>
   .book {
-    position: relative;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     padding: var(--s-4);
@@ -76,26 +72,47 @@
     display: grid;
     gap: var(--s-2);
     margin-bottom: var(--s-5);
+    max-width: 32rem;
   }
 
   label {
     display: grid;
-    gap: var(--s-1);
+    gap: 3px;
+  }
+
+  .eyebrow {
+    color: var(--color-panel-ink-dim);
   }
 
   input,
   textarea {
-    background: var(--color-bg);
+    background: var(--color-void);
+    color: var(--color-ink);
     border: 1px solid var(--color-line);
-    padding: var(--s-2);
+    padding: 6px 8px;
   }
 
   button {
     justify-self: start;
-    background: var(--color-accent);
-    color: var(--color-ink);
+    background: var(--color-red);
+    color: var(--color-on-red);
     border: 1px solid var(--color-void);
-    padding: 0.4rem 0.8rem;
+    padding: 7px 16px;
+    font-size: var(--t-meta);
+    box-shadow: 1px 1px 0 var(--color-void);
+    transition:
+      transform 150ms var(--ease-out),
+      box-shadow 150ms ease;
+  }
+
+  button:hover {
+    box-shadow: 2px 2px 0 var(--color-void);
+    transform: translateY(-1px);
+  }
+
+  button:active {
+    transform: scale(0.96);
+    box-shadow: 1px 1px 0 var(--color-void);
   }
 
   .thread {
@@ -103,21 +120,41 @@
     padding: 0;
     margin: 0;
     display: grid;
-    gap: var(--s-3);
+    gap: 10px;
   }
 
   .nested {
-    margin-top: var(--s-3);
-    border-left: 2px solid var(--color-accent);
-    padding-left: var(--s-3);
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .entry {
+    border: 1px solid var(--color-line);
+    background: var(--color-void);
+    padding: 10px;
+    box-shadow: 2px 2px 0 var(--color-shadow);
+    animation: riseIn 320ms var(--ease-out);
+  }
+
+  .reply {
+    margin: 10px 0 0 20px;
+    border: 0;
+    border-left: 2px solid var(--color-red);
+    padding: 0 0 0 10px;
+    background: transparent;
+    box-shadow: none;
   }
 
   .entry header {
     display: flex;
     justify-content: space-between;
     gap: var(--s-3);
-    font-size: var(--t-meta);
-    margin-bottom: var(--s-1);
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  strong {
+    color: var(--color-ink);
   }
 
   time {
@@ -126,6 +163,17 @@
   }
 
   .entry p {
-    color: var(--color-ink-soft);
+    color: var(--color-ink-dim);
+    margin: 0;
+    font-size: var(--t-meta);
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entry { animation: none; }
   }
 </style>

@@ -24,8 +24,13 @@
 }
 
 @keyframes playing-pulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .grain {
@@ -38,6 +43,7 @@
   opacity: var(--grain-opacity);
   mix-blend-mode: overlay;
   pointer-events: none;
+  z-index: 1;
   animation: grain-drift var(--dur-grain) linear infinite alternate;
 }
 

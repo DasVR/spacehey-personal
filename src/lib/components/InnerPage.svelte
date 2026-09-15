@@ -31,7 +31,7 @@
   }
 
   .inner :global(p) {
-    color: var(--color-ink-soft);
+    color: var(--color-panel-ink-dim);
     max-width: 38rem;
     margin: 0 0 var(--s-3);
   }

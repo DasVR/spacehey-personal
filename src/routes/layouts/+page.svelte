@@ -5,8 +5,8 @@
 
 <InnerPage title="Layouts">
   <p>
-    Casual is this page: torn paper, grain, a flyer that would not survive the photocopier.
-    Pro is the clean portfolio skin hiding behind the toggle — same data, different coat.
+    Casual is this page: cream cards on black, a barcode in the corner, red links.
+    Pro is the clean portfolio skin hiding behind the pill toggle — same data, different coat.
   </p>
   <p>
     A real customizer (edit the data, not the markup) is the next layer. The [edit] link on

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import { profileState } from '$lib/profile.svelte.ts';
   import type { Widget, WidgetKind } from '$lib/data/types';
 
@@ -28,7 +27,6 @@
 </script>
 
 <section class="widgets">
-  <GrainLayer />
   <div class="head">
     <h2 class="section-title">Widgets</h2>
     <button class="edit-link" type="button" onclick={() => profileState.addWidget()}>
@@ -63,8 +61,6 @@
 
 <style>
   .widgets {
-    position: relative;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     padding: var(--s-4);
@@ -75,61 +71,77 @@
     justify-content: space-between;
     align-items: baseline;
     gap: var(--s-3);
+    margin-bottom: 10px;
+  }
+
+  .head .section-title {
+    margin-bottom: 0;
   }
 
   .edit-link {
     background: none;
     border: 0;
     padding: 0;
-    color: var(--color-accent-bright);
+    color: var(--color-red);
     font-weight: 700;
-    font-size: var(--t-meta);
+    font-size: 11px;
+  }
+
+  .edit-link:hover {
+    opacity: 0.7;
   }
 
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--s-3);
+    gap: 10px;
     align-items: start;
   }
 
   .card {
-    background: color-mix(in srgb, var(--color-bg) 45%, var(--color-panel));
+    background: var(--color-void);
     border: 1px solid var(--color-line);
-    padding: var(--s-3);
-    min-height: 7.5rem;
+    padding: 10px;
+    min-height: 100px;
+    animation: riseIn 320ms var(--ease-out);
+    transition:
+      transform 180ms var(--ease-out),
+      box-shadow 180ms ease;
   }
 
-  .card:nth-child(3n) {
-    min-height: 9.5rem;
-    transform: rotate(-0.6deg);
-  }
-
-  .card:nth-child(2) {
-    min-height: 8.4rem;
-    transform: rotate(0.8deg);
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 2px 3px 8px var(--color-shadow);
   }
 
   .wide {
     grid-column: span 2;
-    min-height: 6.2rem;
   }
 
   h3 {
-    font-size: var(--t-lead);
-    margin: 0.2rem 0 var(--s-2);
+    font-size: 14px;
+    margin: 0 0 6px;
     text-transform: lowercase;
+    color: var(--color-ink);
   }
 
   .card p:last-child {
-    color: var(--color-ink-soft);
+    color: var(--color-ink-dim);
+    font-size: var(--t-meta);
+    line-height: var(--lh-body);
+    margin: 0;
+  }
+
+  .eyebrow {
+    color: var(--color-ink-dim);
   }
 
   input,
   textarea {
     width: 100%;
     background: var(--color-bg);
-    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-dark);
     padding: var(--s-2);
     margin-top: var(--s-1);
   }
@@ -139,10 +151,17 @@
     .wide { grid-column: span 1; }
   }
 
-  :global([data-theme='pro']) .card,
-  :global([data-theme='pro']) .card:nth-child(2),
-  :global([data-theme='pro']) .card:nth-child(3n) {
+  :global([data-theme='pro']) .card:hover {
     transform: none;
-    min-height: 0;
+    box-shadow: none;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; }
   }
 </style>

@@ -7,6 +7,14 @@ export interface Tag {
   label: string;
 }
 
+export interface SocialLink {
+  id: string;
+  mark: string;
+  label: string;
+  href: string;
+  accent?: boolean;
+}
+
 export type ContactId = 'friend' | 'message' | 'im' | 'forward';
 
 export interface ContactAction {
@@ -80,6 +88,8 @@ export interface Profile {
   avatar: { src: string; alt: string };
   tags: Tag[];
   nav: NavLink[];
+  barcode: string;
+  socials: SocialLink[];
   contacts: ContactAction[];
   about: string;
   meet: string;

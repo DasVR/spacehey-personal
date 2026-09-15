@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import type { InterestRow } from '$lib/data/types';
 
   interface Props {
@@ -10,7 +9,6 @@
 </script>
 
 <section class="interests">
-  <GrainLayer />
   <h2 class="section-title">Das's Interests</h2>
   <table>
     <tbody>
@@ -26,8 +24,6 @@
 
 <style>
   .interests {
-    position: relative;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     padding: var(--s-4);
@@ -36,32 +32,30 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--t-body);
+    font-size: var(--t-meta);
   }
 
   th,
   td {
     vertical-align: top;
-    padding: 0.55rem 0.65rem;
+    padding: 8px 10px;
     border: 1px solid var(--color-line);
   }
 
   th {
-    width: 8.5rem;
-    background: var(--color-accent);
+    width: 8rem;
+    background: var(--color-void);
     color: var(--color-ink);
     font-weight: 700;
     text-align: left;
-    letter-spacing: 0.01em;
   }
 
   td {
-    background: color-mix(in srgb, var(--color-bg) 55%, var(--color-panel));
-    color: var(--color-ink-soft);
+    color: var(--color-panel-ink-dim);
   }
 
   :global([data-theme='pro']) th {
-    background: var(--color-raised);
-    color: var(--color-ink);
+    background: var(--color-panel-ink);
+    color: var(--color-panel);
   }
 </style>

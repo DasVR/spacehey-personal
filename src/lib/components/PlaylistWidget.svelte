@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
+  import Barcode from './Barcode.svelte';
   import type { Track } from '$lib/data/types';
   import { assetUrl } from '$lib/utils/urls';
 
@@ -23,9 +23,11 @@
   }
 </script>
 
-<section class="player torn-edge">
-  <GrainLayer />
-  <h2 class="section-title">Now Playing</h2>
+<section class="player">
+  <div class="head">
+    <h2 class="section-title">Now Playing</h2>
+    <Barcode kind="compact" />
+  </div>
   <div class="body">
     <div class="art">
       <img src={assetUrl(art)} alt="{title} cover art" />
@@ -46,7 +48,7 @@
         {/each}
       </ol>
       <p class="hint">
-        {active.title} — audio hookup later (Spotify / Apple Music / a real file). The row is live; the speakers are not.
+        {active.title} — audio hookup later (Spotify link above). The row is live; the speakers are not.
       </p>
     </div>
   </div>
@@ -56,17 +58,37 @@
   .player {
     position: relative;
     z-index: 6;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     padding: var(--s-5) var(--s-4);
   }
 
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .head .section-title {
+    margin-bottom: 0;
+  }
+
   .body {
     display: grid;
-    grid-template-columns: 10.5rem 1fr;
+    grid-template-columns: 150px 1fr;
     gap: var(--s-5);
     align-items: start;
+  }
+
+  .art {
+    transform: rotate(-1.5deg);
+    box-shadow: 2px 3px 6px var(--color-shadow);
+    transition: transform 220ms var(--ease-out);
+  }
+
+  .art:hover {
+    transform: rotate(-0.5deg) scale(1.03);
   }
 
   .art img {
@@ -75,69 +97,82 @@
     object-fit: cover;
     filter: contrast(var(--photo-contrast)) grayscale(var(--photo-gray)) sepia(var(--photo-sepia));
     border: 3px solid var(--color-void);
-    box-shadow: 2px 3px 6px var(--color-shadow);
-    transform: rotate(-1.5deg);
   }
 
   h3 {
     font-family: var(--font-display);
     letter-spacing: var(--track-display);
     text-transform: uppercase;
-    margin: 0.15rem 0 var(--s-3);
+    margin: 2px 0 10px;
+    color: var(--color-panel-ink);
+    font-size: 15px;
   }
 
   ol {
     list-style: none;
     padding: 0;
-    margin: 0 0 var(--s-3);
+    margin: 0 0 10px;
+  }
+
+  li {
+    border-bottom: 1px solid var(--color-line);
   }
 
   button {
     width: 100%;
     display: grid;
-    grid-template-columns: 0.7rem 1fr auto auto;
+    grid-template-columns: 12px 1fr auto auto;
     gap: var(--s-2);
     align-items: baseline;
     background: none;
     border: 0;
-    padding: 0.28rem 0;
+    padding: 5px 4px;
     text-align: left;
-    color: var(--color-ink-dim);
-    border-bottom: 1px solid var(--color-line);
+    color: var(--color-panel-ink-dim);
+    border-radius: 2px;
+    transition:
+      color 200ms ease,
+      background-color 150ms ease;
+  }
+
+  button:hover {
+    background: var(--color-red-wash);
   }
 
   li.on button {
-    color: var(--color-ink);
+    color: var(--color-panel-ink);
   }
 
   .who {
-    font-size: var(--t-micro);
-    color: var(--color-ink-dim);
+    font-size: 10px;
+    color: var(--color-panel-ink-dim);
   }
 
   .dur {
     font-family: var(--font-mono);
-    font-size: var(--t-micro);
+    font-size: 10px;
+    color: var(--color-panel-ink-dim);
   }
 
   .playing-dot {
-    width: 0.45rem;
-    height: 0.45rem;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--color-accent-bright);
+    background: var(--color-red);
     opacity: 0;
     align-self: center;
+    transition: opacity 250ms ease;
   }
 
   .playing-dot.live {
     opacity: 1;
-    animation: playing-pulse 2.8s ease-in-out infinite;
+    animation: playing-pulse 1.8s ease-in-out infinite;
   }
 
   .hint {
-    margin-top: var(--s-2);
-    font-size: var(--t-meta);
-    color: var(--color-ink-dim);
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-panel-ink-dim);
   }
 
   @media (max-width: 640px) {
@@ -145,9 +180,13 @@
     .art { width: 12rem; }
   }
 
-  :global([data-theme='pro']) .art img {
+  :global([data-theme='pro']) .art,
+  :global([data-theme='pro']) .art:hover {
     transform: none;
-    border: 0;
     box-shadow: none;
+  }
+
+  :global([data-theme='pro']) .art img {
+    border: 0;
   }
 </style>

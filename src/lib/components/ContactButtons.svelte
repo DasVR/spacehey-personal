@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import { profileState } from '$lib/profile.svelte.ts';
   import type { ContactAction } from '$lib/data/types';
 
@@ -11,11 +10,14 @@
 </script>
 
 <section class="contact">
-  <GrainLayer />
   <h2 class="section-title">Contacting Das</h2>
   <div class="rows">
-    {#each actions as action (action.id)}
-      <button type="button" onclick={() => profileState.ping(action.id)}>
+    {#each actions as action, index (action.id)}
+      <button
+        type="button"
+        class:primary={index === 0}
+        onclick={() => profileState.ping(action.id)}
+      >
         {action.label}
       </button>
     {/each}
@@ -24,11 +26,9 @@
 
 <style>
   .contact {
-    position: relative;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    padding: var(--s-4);
+    padding: 14px var(--s-4);
   }
 
   .rows {
@@ -38,28 +38,42 @@
   }
 
   button {
-    background: var(--color-accent);
+    background: var(--color-void);
     color: var(--color-ink);
     border: 1px solid var(--color-void);
     box-shadow: 1px 1px 0 var(--color-void);
-    padding: 0.4rem 0.55rem;
-    font-size: var(--t-meta);
+    padding: 8px 6px;
+    font-size: 11px;
     text-align: left;
+    transition:
+      transform 150ms var(--ease-out),
+      box-shadow 150ms ease;
+  }
+
+  button.primary {
+    background: var(--color-red);
+    color: var(--color-on-red);
   }
 
   button:hover {
-    background: var(--color-accent-bright);
+    box-shadow: 2px 2px 0 var(--color-void);
+    transform: translateY(-1px);
   }
 
   button:active {
-    transform: translate(1px, 1px);
-    box-shadow: none;
+    transform: scale(0.96);
+    box-shadow: 1px 1px 0 var(--color-void);
   }
 
   :global([data-theme='pro']) button {
     background: transparent;
-    color: var(--color-ink);
+    color: var(--color-panel-ink);
     box-shadow: none;
     border-color: var(--color-line);
+  }
+
+  :global([data-theme='pro']) button.primary {
+    background: var(--color-red);
+    color: var(--color-on-red);
   }
 </style>
