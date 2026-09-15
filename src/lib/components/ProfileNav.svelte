@@ -2,6 +2,7 @@
   import { page } from '$app/state';
   import type { NavLink } from '$lib/data/types';
   import { theme } from '$lib/theme.svelte.ts';
+  import { pageHref } from '$lib/utils/urls';
 
   interface Props {
     brand: string;
@@ -12,12 +13,12 @@
 </script>
 
 <header class="nav">
-  <a class="brand" href="/">{brand} <span class="slash">/ p</span></a>
+  <a class="brand" href={pageHref('/')}>{brand} <span class="slash">/ p</span></a>
   <nav aria-label="Profile">
     {#each links as link (link.href)}
       <a
-        href={link.href}
-        aria-current={page.url.pathname === link.href ? 'page' : undefined}
+        href={pageHref(link.href)}
+        aria-current={page.route.id === link.href ? 'page' : undefined}
       >
         {link.label}
       </a>
