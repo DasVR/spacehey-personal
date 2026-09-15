@@ -1,0 +1,128 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+}
+
+body {
+  background-image:
+    radial-gradient(1200px 700px at 50% -10%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 110% 40%, color-mix(in srgb, var(--color-void) 70%, transparent), transparent 50%);
+}
+
+a {
+  color: var(--color-accent-bright);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-halo);
+  outline-offset: 2px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+.page-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+.page-well {
+  position: relative;
+  z-index: var(--z-base);
+  width: min(100% - 1.5rem, var(--page-max));
+  margin: 0 auto;
+  padding: 0.75rem 0 2.5rem;
+}
+
+.section {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  padding: var(--s-4);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--t-head);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  line-height: var(--lh-tight);
+  margin-bottom: var(--s-3);
+  color: var(--color-ink);
+}
+
+.edit-link {
+  font-family: var(--font-body);
+  font-size: var(--t-meta);
+  color: var(--color-accent-bright);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.eyebrow {
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-tick);
+  text-transform: uppercase;
+  color: var(--color-ink-dim);
+}
+
+[data-theme='pro'] body {
+  background-image: none;
+}
+
+[data-theme='pro'] .section {
+  overflow: visible;
+  border-radius: 2px;
+}
+
+[data-theme='pro'] .torn-edge {
+  clip-path: none;
+}
+
+[data-theme='pro'] .section-title {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}

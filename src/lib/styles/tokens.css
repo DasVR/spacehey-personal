@@ -1,0 +1,86 @@
+/* Locked palette from the profile brief. Hex lives only in this file. */
+
+:root {
+  --font-display: 'Anton', Impact, sans-serif;
+  --font-body: 'Trebuchet MS', 'Trebuchet', sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+  --color-bg: #0d0b09;
+  --color-panel: #161310;
+  --color-ink: #d9d0c2;
+  --color-ink-dim: #8f8577;
+  --color-accent: #7a4a32;
+  --color-accent-bright: #b06a42;
+
+  --color-void: #000000;
+  --color-glitch-r: #ff2d55;
+  --color-glitch-c: #2de0ff;
+  --color-paper: #cfc3b0;
+  --color-halo: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 16%, var(--color-bg));
+  --color-line-hot: color-mix(in srgb, var(--color-accent-bright) 45%, var(--color-bg));
+  --color-raised: color-mix(in srgb, var(--color-panel) 82%, var(--color-ink));
+  --color-ink-soft: color-mix(in srgb, var(--color-ink) 72%, var(--color-bg));
+  --color-shadow: color-mix(in srgb, var(--color-void) 55%, transparent);
+  --color-panel-glass: color-mix(in srgb, var(--color-panel) 88%, transparent);
+
+  --t-micro: 0.6875rem;
+  --t-meta: 0.75rem;
+  --t-body: 0.875rem;
+  --t-lead: 1.05rem;
+  --t-head: 1.35rem;
+  --t-display: clamp(2.8rem, 8vw, 5.4rem);
+
+  --track-display: 0.02em;
+  --track-tick: 0.12em;
+
+  --lh-tight: 0.92;
+  --lh-body: 1.55;
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+
+  --page-max: 64rem;
+  --left-col: 17.5rem;
+
+  --z-base: 1;
+  --z-bleed: 2;
+  --z-nav: 20;
+  --z-grain: 30;
+
+  --grain-opacity: 0.3;
+  --photo-contrast: 1.3;
+  --photo-gray: 0.4;
+  --photo-sepia: 0.08;
+}
+
+[data-theme='pro'] {
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --color-bg: #f3efe6;
+  --color-panel: #fffcf7;
+  --color-ink: #1c1914;
+  --color-ink-dim: #6b645a;
+  --color-accent: #3d342c;
+  --color-accent-bright: #1c1914;
+  --color-void: #1c1914;
+  --color-glitch-r: transparent;
+  --color-glitch-c: transparent;
+  --color-paper: #fffcf7;
+  --color-halo: color-mix(in srgb, var(--color-ink) 40%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 14%, var(--color-bg));
+  --color-line-hot: var(--color-ink);
+  --color-raised: #fffcf7;
+  --color-ink-soft: color-mix(in srgb, var(--color-ink) 80%, var(--color-bg));
+  --color-shadow: color-mix(in srgb, var(--color-void) 10%, transparent);
+  --color-panel-glass: var(--color-panel);
+  --grain-opacity: 0;
+  --photo-contrast: 1;
+  --photo-gray: 0.08;
+  --photo-sepia: 0;
+}

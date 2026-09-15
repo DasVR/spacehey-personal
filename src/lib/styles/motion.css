@@ -1,0 +1,93 @@
+:root {
+  --dur-flip: 140ms;
+  --dur-panel: 280ms;
+  --dur-glitch: 7s;
+  --dur-grain: 22s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes grain-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-3.5%, -2.5%, 0); }
+}
+
+@keyframes g1 {
+  0%, 92%, 100% { opacity: 0; }
+  93% { transform: translate(-2px, -1px); opacity: 0.8; }
+  95% { opacity: 0; }
+}
+
+@keyframes g2 {
+  0%, 92%, 100% { opacity: 0; }
+  93% { transform: translate(2px, 1px); opacity: 0.8; }
+  95% { opacity: 0; }
+}
+
+@keyframes playing-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  width: 130%;
+  height: 130%;
+  top: -15%;
+  left: -15%;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: grain-drift var(--dur-grain) linear infinite alternate;
+}
+
+.glitch-name {
+  position: relative;
+  display: inline-block;
+  color: var(--color-ink);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--color-void) 40%, transparent);
+}
+
+.glitch-name::before,
+.glitch-name::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.glitch-name::before {
+  color: var(--color-glitch-r);
+  clip-path: inset(0 0 55% 0);
+  animation: g1 var(--dur-glitch) infinite;
+}
+
+.glitch-name::after {
+  color: var(--color-glitch-c);
+  clip-path: inset(55% 0 0 0);
+  animation: g2 var(--dur-glitch) infinite;
+}
+
+.torn-edge {
+  clip-path: polygon(
+    0% 2%, 12% 0%, 24% 1.5%, 38% 0%, 52% 1%, 66% 0%, 80% 1.2%, 100% 0%,
+    100% 97%, 88% 100%, 74% 98%, 60% 100%, 46% 98.5%, 32% 100%, 18% 98%, 0% 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .glitch-name::before,
+  .glitch-name::after,
+  .playing-dot {
+    animation: none;
+  }
+
+  .glitch-name::before,
+  .glitch-name::after {
+    content: none;
+  }
+}
