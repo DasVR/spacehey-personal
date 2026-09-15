@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import { rotateDeg } from '$lib/utils/randomRotate';
   import type { Photo } from '$lib/data/types';
   import { assetUrl } from '$lib/utils/urls';
@@ -30,7 +29,6 @@
 </script>
 
 <section class="scatter-wrap">
-  <GrainLayer />
   <h2 class="section-title">Pics</h2>
   <div
     class="stage"
@@ -66,11 +64,12 @@
     overflow: visible;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    padding: var(--s-4) var(--s-4) 2.25rem;
+    padding: var(--s-4) var(--s-4) 2rem;
   }
 
   .stage {
     position: relative;
+    min-height: 26.25rem;
     height: 36rem;
     perspective: 900px;
     overflow: visible;
@@ -87,8 +86,16 @@
     position: absolute;
     margin: 0;
     background: var(--color-paper);
-    padding: 0.35rem 0.35rem 1.15rem;
+    padding: 6px 6px 20px;
     box-shadow: 2px 3px 6px var(--color-shadow);
+    transition:
+      transform 220ms var(--ease-out),
+      z-index 0s;
+  }
+
+  .photo-tile:hover {
+    z-index: 9;
+    scale: 1.06;
   }
 
   .photo-tile img {
@@ -97,16 +104,6 @@
     object-fit: cover;
     filter: contrast(var(--photo-contrast)) grayscale(var(--photo-gray)) sepia(var(--photo-sepia));
     border: 3px solid var(--color-void);
-  }
-
-  .photo-tile::after {
-    content: '';
-    position: absolute;
-    inset: 0.35rem 0.35rem 1.15rem;
-    background: radial-gradient(circle, transparent 42%, var(--color-void) 43%) 0 0 / 3px 3px;
-    opacity: 0.18;
-    mix-blend-mode: multiply;
-    pointer-events: none;
   }
 
   figcaption {
@@ -121,6 +118,7 @@
   @media (max-width: 720px) {
     .stage {
       height: auto;
+      min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--s-3);
@@ -140,6 +138,7 @@
 
   :global([data-theme='pro']) .stage {
     height: auto;
+    min-height: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--s-3);
@@ -152,12 +151,14 @@
     transform: none !important;
   }
 
-  :global([data-theme='pro']) .photo-tile {
+  :global([data-theme='pro']) .photo-tile,
+  :global([data-theme='pro']) .photo-tile:hover {
     position: relative;
     left: auto !important;
     top: auto !important;
     width: auto !important;
     transform: none !important;
+    scale: 1;
     background: transparent;
     padding: 0;
     box-shadow: none;
@@ -168,7 +169,6 @@
     aspect-ratio: 4 / 5;
   }
 
-  :global([data-theme='pro']) .photo-tile::after,
   :global([data-theme='pro']) figcaption {
     display: none;
   }

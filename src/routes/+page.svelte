@@ -1,6 +1,7 @@
 <script lang="ts">
   import ProfileTitle from '$lib/components/ProfileTitle.svelte';
   import ProfileHeader from '$lib/components/ProfileHeader.svelte';
+  import SocialLinks from '$lib/components/SocialLinks.svelte';
   import ContactButtons from '$lib/components/ContactButtons.svelte';
   import Blurb from '$lib/components/Blurb.svelte';
   import InterestsTable from '$lib/components/InterestsTable.svelte';
@@ -14,10 +15,11 @@
   import { profileState } from '$lib/profile.svelte.ts';
 
   const data = $derived(profileState.data);
+  const editLabel = $derived(profileState.editing ? '[done]' : '[edit]');
 </script>
 
 <main class="profile">
-  <ProfileTitle name={data.displayName} />
+  <ProfileTitle name={data.displayName} barcode={data.barcode} />
 
   <div class="columns">
     <div class="col-left stack">
@@ -30,6 +32,7 @@
         username={data.username}
         tags={data.tags}
       />
+      <SocialLinks links={data.socials} />
       <ContactButtons actions={data.contacts} />
     </div>
     <div class="col-right stack">
@@ -38,6 +41,8 @@
         body={data.about}
         editing={profileState.editing}
         onChange={(value) => profileState.setAbout(value)}
+        actionLabel={editLabel}
+        onAction={() => profileState.toggleEditing()}
       />
       <Blurb
         title="Who I'd like to meet"
@@ -46,11 +51,11 @@
         onChange={(value) => profileState.setMeet(value)}
       />
       <WidgetGrid widgets={data.widgets} />
+      <InterestsTable rows={data.interests} />
     </div>
   </div>
 
   <div class="stack rest">
-    <InterestsTable rows={data.interests} />
     <PhotoScatter photos={data.photos} />
     <PlaylistWidget
       title={data.playlist.title}
@@ -79,7 +84,7 @@
 
   .columns {
     display: grid;
-    grid-template-columns: var(--left-col) 1fr;
+    grid-template-columns: minmax(0, var(--left-col)) minmax(0, 1fr);
     gap: var(--s-4);
     align-items: start;
   }

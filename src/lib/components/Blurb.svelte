@@ -1,22 +1,28 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
-
   interface Props {
     title: string;
     body: string;
     editing?: boolean;
     onChange?: (value: string) => void;
+    actionLabel?: string;
+    onAction?: () => void;
   }
 
-  let { title, body, editing = false, onChange }: Props = $props();
+  let { title, body, editing = false, onChange, actionLabel, onAction }: Props = $props();
 </script>
 
 <section class="blurb">
-  <GrainLayer />
-  <h2 class="section-title">{title}</h2>
+  <div class="head">
+    <h2 class="section-title">{title}</h2>
+    {#if actionLabel && onAction}
+      <button class="edit-link" type="button" onclick={onAction}>
+        {actionLabel}
+      </button>
+    {/if}
+  </div>
   {#if editing}
     <textarea
-      rows="6"
+      rows="5"
       value={body}
       oninput={(e) => onChange?.(e.currentTarget.value)}
     ></textarea>
@@ -27,23 +33,50 @@
 
 <style>
   .blurb {
-    position: relative;
-    overflow: hidden;
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     padding: var(--s-4);
   }
 
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-3);
+    margin-bottom: 10px;
+  }
+
+  .head .section-title {
+    margin-bottom: 0;
+  }
+
+  .edit-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--color-red);
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  .edit-link:hover {
+    opacity: 0.7;
+  }
+
   p,
   textarea {
-    color: var(--color-ink-soft);
+    color: var(--color-panel-ink-dim);
     max-width: 42rem;
+    line-height: var(--lh-body);
+    font-size: 13px;
+    margin: 0;
   }
 
   textarea {
     width: 100%;
-    background: var(--color-bg);
-    border: 1px solid var(--color-line-hot);
+    background: var(--color-void);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-dark);
     padding: var(--s-2);
     resize: vertical;
   }
