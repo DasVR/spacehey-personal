@@ -89,3 +89,16 @@ the serial number and the red). Motion values follow the `better-ui` skill:
 - Photos are still the generated stand-ins.
 - Real audio for Now Playing.
 - `p.dasdev.net` DNS.
+
+## Update: mood-board bento and the dasdev mark
+
+- The casual page is the gothic MySpace mood board rebuilt: paper panels
+  with black title bars (Blurbs, Interests, My Music, Friend Space, Roll,
+  Mood board, Comments), barcode stickers, a red "Add as friend" button.
+  One column on phones, two on tablets, three on laptops with My Music
+  running tall down the side.
+- On laptops the card is sticky and sized to the window, so it never
+  needs scrolling.
+- The masked-face stand-ins are gone. The avatar is the dasdev mark
+  (`static/brand/mark.svg`, also the favicon and top-bar logo), and the
+  Top 8 are colourful initial tiles.

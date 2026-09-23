@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DitherImage from './DitherImage.svelte';
   import type { Friend } from '$lib/data/types';
+  import { assetUrl } from '$lib/utils/urls';
 
   interface Props {
     friends: Friend[];
@@ -12,7 +12,7 @@
 <ul class="grid">
   {#each friends as friend (friend.id)}
     <li>
-      <div class="face"><DitherImage src={friend.src} alt={friend.name} cell={2} levels={2} /></div>
+      <div class="face"><img src={assetUrl(friend.src)} alt={friend.name} loading="lazy" decoding="async" /></div>
       <p class="name">{friend.name}</p>
       <p class="cap">{friend.caption}</p>
     </li>
@@ -25,6 +25,13 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--s-4) var(--s-3);
+  }
+
+  .face img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .face {

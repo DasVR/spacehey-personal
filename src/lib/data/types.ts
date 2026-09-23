@@ -75,6 +75,7 @@ export interface CasualProfile {
   lastSeen: string;
   memberSince: string;
   about: string;
+  meet: string;
   links: Link[];
   roll: Image[];
   /** Full-bleed mood board, dithered like everything else. */

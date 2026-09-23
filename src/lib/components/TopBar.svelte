@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Logo from './Logo.svelte';
   import type { Mode } from '$lib/data/types';
   import { pageHref } from '$lib/utils/urls';
 
@@ -12,7 +13,7 @@
 
 <header class="bar">
   <a class="brand" href={pageHref(mode === 'pro' ? '/pro' : '/')}>
-    <span class="mark" aria-hidden="true"></span>
+    <span class="mark"><Logo size={16} /></span>
     <span>{host}</span>
   </a>
 
@@ -59,13 +60,8 @@
     color: var(--color-ink);
   }
 
-  /* A 2×2 dither cell as the mark. */
   .mark {
-    width: 10px;
-    height: 10px;
-    background:
-      linear-gradient(var(--color-accent), var(--color-accent)) 0 0 / 5px 5px no-repeat,
-      linear-gradient(var(--color-ink), var(--color-ink)) 5px 5px / 5px 5px no-repeat;
+    color: var(--color-accent);
   }
 
   .switch {
