@@ -18,7 +18,9 @@
 <style>
   dl {
     display: grid;
+    container-type: inline-size;
   }
+
 
   div {
     display: grid;
@@ -45,5 +47,12 @@
     line-height: 1.55;
     color: var(--color-ink);
     text-wrap: pretty;
+  }
+  /* Narrow panels: label sits above its value instead of beside it. */
+  @container (max-width: 360px) {
+    div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
   }
 </style>
