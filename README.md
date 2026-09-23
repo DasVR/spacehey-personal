@@ -1,5 +1,8 @@
 # spacehey-personal
 
+The chat that built this page is archived in [`docs/claude/`](docs/claude/README.md):
+brief, zip, inspirations, pull requests, and what is still open.
+
 Personal profile for **p.dasdev.net** — a 2007 SpaceHey page crossed with a
 gig flyer. Torn paper, grain, halftone, stencil type, a rare glitch on the
 name. Not cyberpunk. Not glassy.
