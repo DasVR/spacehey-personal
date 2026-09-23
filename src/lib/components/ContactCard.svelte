@@ -55,7 +55,7 @@
         const clean = new URL(window.location.href);
         clean.searchParams.delete('via');
         replaceState(clean, page.state);
-      }, 2400);
+      }, 2700);
     }
 
     const io = new IntersectionObserver(([entry]) => (offscreen = !entry.isIntersecting && entry.boundingClientRect.bottom < 0), {
@@ -88,7 +88,7 @@
       replayTimer = window.setTimeout(() => {
         arriving = false;
         document.documentElement.classList.remove('arriving');
-      }, 2400);
+      }, 2700);
     });
   }
 
@@ -134,15 +134,28 @@
 </script>
 
 {#if arriving && source}
-  <div class="island" role="status" aria-live="polite">
-    <span class="island-avatar">
-      <img src={assetUrl(identity.avatar.src)} alt="" />
-    </span>
-    <span class="island-text">
-      <span class="island-kicker">{arrivalLabel(source)} · {host || identity.host}</span>
-      <strong>{identity.name}</strong>
-    </span>
-    <span class="island-rings" aria-hidden="true"><i></i><i></i><i></i><Icon name="nfc" size={16} stroke={2} /></span>
+  <div class="isl" role="status" aria-live="polite">
+    <!-- Metaball filter: blurred black shapes re-thresholded so they melt into each other. -->
+    <svg class="isl-defs" width="0" height="0" aria-hidden="true">
+      <filter id="isl-goo" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10" />
+      </filter>
+    </svg>
+    <div class="goo" aria-hidden="true">
+      <span class="lip"></span>
+      <span class="blob"></span>
+    </div>
+    <div class="face">
+      <span class="island-avatar">
+        <img src={assetUrl(identity.avatar.src)} alt="" />
+      </span>
+      <span class="island-text">
+        <span class="island-kicker">{arrivalLabel(source)} · {host || identity.host}</span>
+        <strong>{identity.name}</strong>
+      </span>
+      <span class="island-rings" aria-hidden="true"><i></i><i></i><i></i><Icon name="nfc" size={16} stroke={2} /></span>
+    </div>
   </div>
 {/if}
 
@@ -590,25 +603,69 @@
 
   /* ---------- arrival: the island ---------- */
 
-  .island {
+  /*
+   * The island drips out of the phone's own Dynamic Island.
+   * --anchor is where the hardware island sits: 11px down in a home-screen
+   * app (content runs under the status bar), tucked just above the top edge
+   * in Safari so the drop appears to pour out of it.
+   */
+  .isl {
+    --anchor: clamp(-30px, calc(env(safe-area-inset-top, 0px) - 48px), 11px);
+    --w: min(372px, calc(100vw - 20px));
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    left: 50%;
+    inset: 0 0 auto;
     z-index: var(--z-island);
+    height: 160px;
+    pointer-events: none;
+  }
+
+  .isl-defs {
+    position: absolute;
+  }
+
+  .goo {
+    position: absolute;
+    inset: 0;
+    filter: url(#isl-goo);
+  }
+
+  .lip,
+  .blob,
+  .face {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    background: oklch(0 0 0);
+  }
+
+  /* Stand-in for the hardware island; it bulges as the drop pulls away. */
+  .lip {
+    top: var(--anchor);
+    width: 126px;
+    height: 37px;
+    border-radius: 20px;
+    animation: lip 2.6s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .blob,
+  .face {
+    animation: drop 2.6s both;
+  }
+
+  /* Contents live only while the island is open. */
+  .face > * {
+    animation: face-content 2.6s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .face {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 0 10px;
-    translate: -50% 0;
-    /* Always black, like the hardware it grows out of. */
-    background: oklch(0.08 0 0);
-    color: oklch(0.97 0 0);
-    box-shadow:
-      0 0 0 1px oklch(1 0 0 / 0.06) inset,
-      0 18px 50px -12px oklch(0 0 0 / 0.55);
     overflow: hidden;
     white-space: nowrap;
-    animation: island 2.6s both;
+    color: oklch(0.97 0 0);
+    background: none;
   }
 
   .island-avatar {
@@ -621,7 +678,7 @@
     /* A ring of light chasing round the photo, like a live share. */
     background: conic-gradient(from var(--spin, 0deg), var(--color-accent), oklch(1 0 0 / 0.1) 40%, var(--color-accent));
     animation:
-      island-part 400ms cubic-bezier(0.2, 0, 0, 1) 260ms both,
+      face-content 2.6s cubic-bezier(0.2, 0, 0, 1) both,
       spin 1.6s linear infinite;
   }
 
@@ -638,7 +695,6 @@
     display: grid;
     min-width: 0;
     line-height: 1.15;
-    animation: island-part 400ms cubic-bezier(0.2, 0, 0, 1) 320ms both;
   }
 
   .island-kicker {
@@ -667,7 +723,6 @@
     height: 44px;
     margin-left: auto;
     color: var(--color-live);
-    animation: island-part 400ms cubic-bezier(0.2, 0, 0, 1) 380ms both;
   }
 
   .island-rings i {
@@ -691,12 +746,12 @@
 
   .arriving .card {
     transform-origin: 50% 0;
-    animation: card-drop 900ms var(--ease-out) 420ms backwards;
+    animation: card-drop 900ms var(--ease-out) 700ms backwards;
   }
 
   .arriving [style*='--i'] {
     animation: part-in 500ms var(--ease-out) backwards;
-    animation-delay: calc(640ms + var(--i) * 90ms);
+    animation-delay: calc(900ms + var(--i) * 90ms);
   }
 
   /* Before hydration: hide the card if the page was opened from a tag. */
@@ -772,49 +827,101 @@
     }
   }
 
-  /* Pill → live activity → pill. The spring curve is iOS-ish: fast out, tiny settle. */
-  @keyframes island {
+  /*
+   * 0–22%   the pill pours out of the island, neck stretching (goo keeps them joined)
+   * 22–34%  it snaps free and springs open into the live activity
+   * 34–76%  hold
+   * 76–100% it folds back into a pill and gets sucked back up
+   */
+  @keyframes drop {
     0% {
+      top: var(--anchor);
       width: 126px;
       height: 37px;
       border-radius: 20px;
-      opacity: 0;
-      animation-timing-function: linear(0, 0.35 8%, 0.82 20%, 1.02 32%, 1.01 42%, 1);
+      animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
     }
-    4% {
-      opacity: 1;
+    18% {
+      top: calc(var(--anchor) + 40px);
+      width: 110px;
+      height: 44px;
+      border-radius: 22px;
+      animation-timing-function: linear(0, 0.4 10%, 0.86 24%, 1.04 38%, 1.01 52%, 1);
     }
-    24% {
-      width: min(372px, calc(100vw - 20px));
+    34% {
+      top: calc(var(--anchor) + 50px);
+      width: var(--w);
       height: 76px;
       border-radius: 38px;
     }
-    78% {
-      width: min(372px, calc(100vw - 20px));
+    76% {
+      top: calc(var(--anchor) + 50px);
+      width: var(--w);
       height: 76px;
       border-radius: 38px;
-      opacity: 1;
       animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
     }
-    96% {
+    88% {
+      top: calc(var(--anchor) + 34px);
+      width: 126px;
+      height: 37px;
+      border-radius: 20px;
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
+    }
+    98% {
+      top: var(--anchor);
       width: 126px;
       height: 37px;
       border-radius: 20px;
       opacity: 1;
     }
     100% {
-      width: 126px;
-      height: 37px;
-      border-radius: 20px;
+      top: var(--anchor);
       opacity: 0;
     }
   }
 
-  @keyframes island-part {
-    from {
+  @keyframes face-content {
+    0%,
+    22% {
       opacity: 0;
       scale: 0.6;
       filter: blur(6px);
+    }
+    34%,
+    72% {
+      opacity: 1;
+      scale: 1;
+      filter: blur(0);
+    }
+    80%,
+    100% {
+      opacity: 0;
+      scale: 0.6;
+      filter: blur(6px);
+    }
+  }
+
+  @keyframes lip {
+    0% {
+      scale: 1;
+    }
+    10% {
+      scale: 1.12 1.2;
+    }
+    22% {
+      scale: 0.92 1;
+    }
+    32%,
+    84% {
+      scale: 1;
+    }
+    94% {
+      scale: 1.14 1.18;
+    }
+    100% {
+      scale: 1;
     }
   }
 
@@ -853,6 +960,10 @@
     .island-rings i,
     .island-avatar {
       animation: none;
+    }
+
+    .goo {
+      filter: none;
     }
   }
 </style>
