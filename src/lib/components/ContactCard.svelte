@@ -361,29 +361,6 @@
     color: var(--dither-light);
   }
 
-  /*
-   * Laptops: the whole card fits in the window. The poster gives up height
-   * first, so a 13" screen still shows every action without scrolling.
-   */
-  @media (min-width: 960px) {
-    .poster {
-      aspect-ratio: auto;
-      height: clamp(180px, calc(100dvh - 560px), 480px);
-    }
-
-    .casual .name {
-      font-size: clamp(3rem, 7vh, 5.5rem);
-    }
-
-    .body {
-      gap: var(--s-3);
-    }
-
-    .links.grid a {
-      min-height: 52px;
-    }
-  }
-
   /* ---------- pro head ---------- */
 
   .head {

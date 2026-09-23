@@ -37,7 +37,7 @@
 
   --card-w: 25rem;
   --col-w: 42rem;
-  --page-max: 84rem;
+  --page-max: 72rem;
   --gutter: 16px;
 
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
@@ -84,17 +84,6 @@
   --shader-speed: 1;
   --shader-gain: 0.78;
   --shader-cell: 3;
-
-  /* Paper panels on the night page (the mood board's white boxes). */
-  --panel: #ece7dd;
-  --panel-raised: #f6f2ea;
-  --panel-ink: #111111;
-  --panel-dim: #4a463f;
-  --panel-faint: #8a8478;
-  --panel-line: color-mix(in oklch, var(--panel-ink) 12%, transparent);
-  --panel-hover: color-mix(in oklch, var(--panel-ink) 5%, transparent);
-  --panel-bar: #0b0b0b;
-  --panel-bar-ink: #f4f0e8;
 
   --name-font: var(--font-poster);
   --name-case: uppercase;
