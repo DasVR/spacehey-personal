@@ -1,5 +1,6 @@
 <script lang="ts">
   import ContactCard from '$lib/components/ContactCard.svelte';
+  import DitherImage from '$lib/components/DitherImage.svelte';
   import DefinitionList from '$lib/components/DefinitionList.svelte';
   import Guestbook from '$lib/components/Guestbook.svelte';
   import NowPlaying from '$lib/components/NowPlaying.svelte';
@@ -50,6 +51,11 @@
     <Roll photos={casual.roll} />
   </Section>
 
+  <figure class="wall">
+    <div class="wall-frame"><DitherImage src={casual.wall.src} alt={casual.wall.alt} cell={2} /></div>
+    <figcaption><span>mood board</span> press to develop</figcaption>
+  </figure>
+
   <Section index="04" title="Interests">
     <DefinitionList rows={casual.interests} />
   </Section>
@@ -67,6 +73,31 @@
 </Split>
 
 <style>
+  .wall {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .wall-frame {
+    aspect-ratio: 902 / 1024;
+    max-height: 80vh;
+    border-radius: 20px;
+    overflow: hidden;
+    outline: 1px solid var(--img-outline);
+    outline-offset: -1px;
+  }
+
+  .wall figcaption {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
+  }
+
+  .wall figcaption span {
+    color: var(--color-accent);
+    margin-right: var(--s-2);
+  }
+
   .about {
     font-size: var(--t-lead);
     line-height: 1.6;

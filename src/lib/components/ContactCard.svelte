@@ -32,9 +32,11 @@
   const path = $derived(mode === 'pro' ? '/pro' : '/');
   const vcard = $derived(assetUrl(mode === 'pro' ? '/das-pro.vcf' : '/das.vcf'));
   let shareUrl = $state('');
+  let host = $state('');
 
   onMount(() => {
     shareUrl = new URL(pageHref(path), window.location.origin).href;
+    host = window.location.host;
     const root = document.documentElement;
     const from = arrivalSource(window.location.search);
 
@@ -133,16 +135,18 @@
 
 {#if arriving && source}
   <div class="island" role="status" aria-live="polite">
-    <span class="island-avatar"><DitherImage src={identity.avatar.src} alt="" cell={2} levels={2} develop={false} eager /></span>
-    <span class="island-text">
-      <strong>{identity.name}</strong>
-      <span>{arrivalLabel(source)} · {identity.host}</span>
+    <span class="island-avatar">
+      <img src={assetUrl(identity.avatar.src)} alt="" />
     </span>
-    <span class="island-wave"><Icon name="nfc" size={18} /></span>
+    <span class="island-text">
+      <span class="island-kicker">{arrivalLabel(source)} · {host || identity.host}</span>
+      <strong>{identity.name}</strong>
+    </span>
+    <span class="island-rings" aria-hidden="true"><i></i><i></i><i></i><Icon name="nfc" size={16} stroke={2} /></span>
   </div>
 {/if}
 
-<div class="stage" class:arriving>
+<div class="stage" class:arriving class:intro={!source}>
   <article
     class="card {mode}"
     class:tilting
@@ -243,6 +247,10 @@
     transition-property: transform;
     transition-duration: 500ms;
     transition-timing-function: var(--ease-out);
+  }
+
+  /* Ordinary visits get a soft rise. After a tap the card simply stays put. */
+  .intro .card {
     animation: card-rise 700ms var(--ease-out) backwards;
   }
 
@@ -589,47 +597,94 @@
     z-index: var(--z-island);
     display: flex;
     align-items: center;
-    gap: var(--s-3);
-    height: 52px;
-    padding: 6px 14px 6px 6px;
+    gap: 12px;
+    padding: 0 10px;
     translate: -50% 0;
-    border-radius: var(--r-pill);
-    /* Always black, like the hardware it imitates. */
-    background: oklch(0.12 0 0);
-    color: oklch(0.96 0 0);
-    box-shadow: 0 12px 40px -10px oklch(0 0 0 / 0.6);
+    /* Always black, like the hardware it grows out of. */
+    background: oklch(0.08 0 0);
+    color: oklch(0.97 0 0);
+    box-shadow:
+      0 0 0 1px oklch(1 0 0 / 0.06) inset,
+      0 18px 50px -12px oklch(0 0 0 / 0.55);
     overflow: hidden;
     white-space: nowrap;
-    animation: island 2.4s var(--ease-out) both;
+    animation: island 2.6s both;
   }
 
   .island-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
+    position: relative;
     flex: none;
-    animation: fade-in 300ms var(--ease-out) 250ms both;
+    width: 50px;
+    height: 50px;
+    padding: 2px;
+    border-radius: 50%;
+    /* A ring of light chasing round the photo, like a live share. */
+    background: conic-gradient(from var(--spin, 0deg), var(--color-accent), oklch(1 0 0 / 0.1) 40%, var(--color-accent));
+    animation:
+      island-part 400ms cubic-bezier(0.2, 0, 0, 1) 260ms both,
+      spin 1.6s linear infinite;
+  }
+
+  .island-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid oklch(0.08 0 0);
   }
 
   .island-text {
     display: grid;
-    line-height: 1.2;
-    font-size: var(--t-small);
-    animation: fade-in 300ms var(--ease-out) 300ms both;
+    min-width: 0;
+    line-height: 1.15;
+    animation: island-part 400ms cubic-bezier(0.2, 0, 0, 1) 320ms both;
   }
 
-  .island-text span {
-    font-size: var(--t-micro);
-    color: oklch(0.72 0 0);
-  }
-
-  .island-wave {
-    margin-left: var(--s-4);
+  .island-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-live);
-    animation:
-      fade-in 300ms var(--ease-out) 350ms both,
-      wave 1.2s ease-in-out 400ms infinite;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .island-text strong {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* NameDrop-style ripples around the NFC glyph. */
+  .island-rings {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    color: var(--color-live);
+    animation: island-part 400ms cubic-bezier(0.2, 0, 0, 1) 380ms both;
+  }
+
+  .island-rings i {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px currentColor inset;
+    opacity: 0;
+    animation: ripple 1.5s cubic-bezier(0.2, 0, 0, 1) infinite;
+  }
+
+  .island-rings i:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  .island-rings i:nth-child(3) {
+    animation-delay: 1s;
   }
 
   /* ---------- arrival: the card drops out of the island ---------- */
@@ -641,7 +696,7 @@
 
   .arriving [style*='--i'] {
     animation: part-in 500ms var(--ease-out) backwards;
-    animation-delay: calc(900ms + var(--i) * 100ms);
+    animation-delay: calc(640ms + var(--i) * 90ms);
   }
 
   /* Before hydration: hide the card if the page was opened from a tag. */
@@ -717,28 +772,66 @@
     }
   }
 
+  /* Pill → live activity → pill. The spring curve is iOS-ish: fast out, tiny settle. */
   @keyframes island {
     0% {
-      width: 120px;
-      height: 36px;
+      width: 126px;
+      height: 37px;
+      border-radius: 20px;
       opacity: 0;
+      animation-timing-function: linear(0, 0.35 8%, 0.82 20%, 1.02 32%, 1.01 42%, 1);
     }
-    8% {
+    4% {
       opacity: 1;
     }
-    22% {
-      width: min(340px, calc(100vw - 32px));
-      height: 52px;
+    24% {
+      width: min(372px, calc(100vw - 20px));
+      height: 76px;
+      border-radius: 38px;
     }
-    72% {
-      width: min(340px, calc(100vw - 32px));
-      height: 52px;
+    78% {
+      width: min(372px, calc(100vw - 20px));
+      height: 76px;
+      border-radius: 38px;
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    }
+    96% {
+      width: 126px;
+      height: 37px;
+      border-radius: 20px;
       opacity: 1;
     }
     100% {
-      width: 120px;
-      height: 36px;
+      width: 126px;
+      height: 37px;
+      border-radius: 20px;
       opacity: 0;
+    }
+  }
+
+  @keyframes island-part {
+    from {
+      opacity: 0;
+      scale: 0.6;
+      filter: blur(6px);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      --spin: 360deg;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      opacity: 0.7;
+      scale: 0.45;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
     }
   }
 
@@ -746,12 +839,6 @@
     from {
       opacity: 0;
       filter: blur(4px);
-    }
-  }
-
-  @keyframes wave {
-    50% {
-      opacity: 0.4;
     }
   }
 
@@ -763,7 +850,8 @@
       transform: none;
     }
 
-    .island-wave {
+    .island-rings i,
+    .island-avatar {
       animation: none;
     }
   }

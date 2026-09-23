@@ -41,6 +41,10 @@ export const casual: CasualProfile = {
     { src: '/photos/desk-glow.jpg', alt: 'A dim workstation with a glowing monitor' },
     { src: '/photos/window-rain.jpg', alt: 'Rain on a night window' },
   ],
+  wall: {
+    src: '/photos/mood-board.jpg',
+    alt: 'Gothic MySpace mood board: black-and-white collage, barcodes, wings, a dense friend grid',
+  },
   playlist: {
     title: 'Gig Flyer Vol. 2',
     artist: 'das · mix',
