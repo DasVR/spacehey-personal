@@ -6,6 +6,7 @@ This folder is the `.claude` project for the chat that built
 | File | Contents |
 |------|----------|
 | [CLAUDE.md](CLAUDE.md) | Standing brief |
+| [redesign-tap-card.md](redesign-tap-card.md) | **Current UI**: the NFC tap card, shaders, modes |
 | [.claude/CLAUDE.md](.claude/CLAUDE.md) | Same brief, loaded when this folder is a Claude Code root |
 | [conversation.md](conversation.md) | Every user message, including the original prompt |
 | [inspirations.md](inspirations.md) | References and what was taken vs kept |

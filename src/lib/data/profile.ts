@@ -1,143 +1,52 @@
-import type { Profile } from './types';
+import type { CasualProfile, Identity, ProProfile } from './types';
 
-export const profile: Profile = {
+/*
+ * All copy lives here. Components take props; routes compose.
+ * Casual carries the SpaceHey profile forward. Pro is the same person on paper.
+ */
+
+export const identity: Identity = {
+  name: 'Das',
+  handle: 'das',
   brand: 'dasdev.net',
-  displayName: 'DAS',
-  username: 'das',
+  host: 'p.dasdev.net',
+  email: 'hello@dasdev.net',
   location: 'Florida · remote',
-  memberSince: 'Jan 20, 2007',
-  mood: 'currently: compiling a feeling',
-  lastLogin: 'right now, probably',
   avatar: {
     src: '/photos/avatar.jpg',
     alt: 'Das, half in shadow, analog-portrait crop',
   },
-  tags: [
-    { label: 'florida' },
-    { label: 'analog' },
-    { label: 'nil' },
-    { label: '2007' },
-    { label: 'homelab' },
+};
+
+export const casual: CasualProfile = {
+  tagline: 'websites that don’t come out of a template drawer',
+  status: 'compiling a feeling',
+  lastSeen: 'right now, probably',
+  memberSince: 'Jan 20, 2007',
+  about:
+    'I build for small businesses and for myself — NIL, a Minecraft box that stays up, RouteSim, this page. Florida humidity on the windows, analog cameras in a drawer, old web in the bookmarks. A room with the lights down and a flyer on the wall.',
+  links: [
+    { id: 'ig', label: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
+    { id: 'x', label: 'X', href: 'https://x.com/', icon: 'x' },
+    { id: 'dc', label: 'Discord', href: 'https://discord.com/', icon: 'discord' },
+    { id: 'sp', label: 'Spotify', href: 'https://open.spotify.com/', icon: 'spotify' },
+    { id: 'gh', label: 'GitHub', href: 'https://github.com/DasVR', icon: 'github', detail: 'DasVR' },
+    { id: 'www', label: 'dasdev.net', href: 'https://dasdev.net', icon: 'globe' },
   ],
-  nav: [
-    { href: '/', label: 'home' },
-    { href: '/blog', label: 'blog' },
-    { href: '/friends', label: 'friends' },
-    { href: '/layouts', label: 'layouts' },
-  ],
-  contacts: [
-    { id: 'friend', label: 'add to friends' },
-    { id: 'message', label: 'send message' },
-    { id: 'im', label: 'instant message' },
-    { id: 'forward', label: 'forward to friend' },
-  ],
-  about: `Websites that don't look like they came out of a template drawer. I build for small businesses and for myself — NIL, a Minecraft box that stays up, RouteSim, this page. Florida humidity on the windows, analog cameras in a drawer, old web in the bookmarks. Not cyberpunk. Just a room with the lights down and a flyer on the wall.`,
-  meet: `People who still leave comments. Band kids who grew into operators. Anyone who will sit with a half-broken layout until it feels like a place. If you still check SpaceHey, we would probably get along.`,
-  interests: [
-    {
-      label: 'General',
-      value: 'homelab nights, analog cameras, Florida storms, making websites that feel inhabited, tearing flyers off telephone poles (and putting them back)',
-    },
-    {
-      label: 'Music',
-      value: 'Deftones, Nirvana, Have a Nice Life, Slowdive, Type O Negative, whatever was on the mix CD in the glovebox',
-    },
-    {
-      label: 'Movies / TV',
-      value: 'Donnie Darko, Serial Experiments Lain, old Adult Swim bumper hours, concert docs shot on cheap cameras',
-    },
-    {
-      label: 'Heroes',
-      value: 'whoever left a 2004 guestbook entry that still loads, the person who invented the 88×31 blinkie, my future self if he ships',
-    },
-  ],
-  widgets: [
-    {
-      id: 'game',
-      kind: 'game',
-      title: 'favorite game',
-      body: 'Minecraft — the das box is still humming. Building in the dark with the rain on.',
-    },
-    {
-      id: 'status',
-      kind: 'status',
-      title: 'server status',
-      body: 'homelab: up · NIL hunt: idle · this page: live on p.dasdev.net',
-      span: 1,
-    },
-    {
-      id: 'building',
-      kind: 'building',
-      title: 'currently building',
-      body: 'NIL (terminal-first workstation) and this profile, which is allowed to look a little ruined.',
-      span: 2,
-    },
-  ],
-  photos: [
-    {
-      src: '/photos/gig-lights.jpg',
-      alt: 'Crowd silhouettes under orange stage lights',
-      rotate: -3,
-      left: '-3%',
-      top: '4%',
-      width: '32%',
-      z: 3,
-      bleed: true,
-    },
-    {
-      src: '/photos/torn-flyer.jpg',
-      alt: 'A torn gig flyer taped to a brick wall',
-      rotate: 4,
-      left: '24%',
-      top: '0%',
-      width: '36%',
-      z: 4,
-    },
-    {
-      src: '/photos/night-road.jpg',
-      alt: 'A Florida night road under one streetlight',
-      rotate: -2,
-      left: '58%',
-      top: '8%',
-      width: '34%',
-      z: 2,
-      bleed: true,
-    },
-    {
-      src: '/photos/cassette.jpg',
-      alt: 'A cassette resting on a wooden desk',
-      rotate: 2,
-      left: '4%',
-      top: '38%',
-      width: '32%',
-      z: 5,
-    },
-    {
-      src: '/photos/desk-glow.jpg',
-      alt: 'A dim workstation with a glowing monitor',
-      rotate: -4,
-      left: '36%',
-      top: '40%',
-      width: '28%',
-      z: 3,
-    },
-    {
-      src: '/photos/window-rain.jpg',
-      alt: 'Rain on a night window',
-      rotate: 3,
-      left: '64%',
-      top: '38%',
-      width: '28%',
-      z: 4,
-      bleed: true,
-    },
+  roll: [
+    { src: '/photos/gig-lights.jpg', alt: 'Crowd silhouettes under orange stage lights' },
+    { src: '/photos/torn-flyer.jpg', alt: 'A torn gig flyer taped to a brick wall' },
+    { src: '/photos/night-road.jpg', alt: 'A Florida night road under one streetlight' },
+    { src: '/photos/cassette.jpg', alt: 'A cassette resting on a wooden desk' },
+    { src: '/photos/desk-glow.jpg', alt: 'A dim workstation with a glowing monitor' },
+    { src: '/photos/window-rain.jpg', alt: 'Rain on a night window' },
   ],
   playlist: {
-    title: 'GIG FLYER VOL. 2',
+    title: 'Gig Flyer Vol. 2',
     artist: 'das · mix',
-    art: '/album/gig-flyer-vol2.jpg',
+    art: { src: '/album/gig-flyer-vol2.jpg', alt: 'Gig Flyer Vol. 2 cover' },
     tracks: [
-      { id: 't1', title: 'Change (In the House of Flies)', artist: 'Deftones', duration: '4:59', playing: true },
+      { id: 't1', title: 'Change (In the House of Flies)', artist: 'Deftones', duration: '4:59' },
       { id: 't2', title: 'Heart-Shaped Box', artist: 'Nirvana', duration: '4:41' },
       { id: 't3', title: 'Be Quiet and Drive (Far Away)', artist: 'Deftones', duration: '5:08' },
       { id: 't4', title: 'Bloodhail', artist: 'Have a Nice Life', duration: '6:13' },
@@ -145,13 +54,23 @@ export const profile: Profile = {
       { id: 't6', title: 'Love You to Death', artist: 'Type O Negative', duration: '7:08' },
     ],
   },
-  blinkies: [
-    { id: 'html', label: 'html 4.01' },
-    { id: 'best', label: 'best viewed 800×600' },
-    { id: 'uc', label: 'under construction' },
-    { id: 'guestbook', label: 'sign my guestbook' },
-    { id: 'analog', label: 'shot on analog' },
-    { id: 'nil', label: 'nil inside' },
+  interests: [
+    {
+      label: 'General',
+      value: 'homelab nights, analog cameras, Florida storms, websites that feel inhabited',
+    },
+    {
+      label: 'Music',
+      value: 'Deftones, Nirvana, Have a Nice Life, Slowdive, Type O Negative, the mix CD in the glovebox',
+    },
+    {
+      label: 'Watching',
+      value: 'Donnie Darko, Serial Experiments Lain, old Adult Swim bumpers, concert docs on cheap cameras',
+    },
+    {
+      label: 'Heroes',
+      value: 'whoever left a 2004 guestbook entry that still loads, the inventor of the 88×31 blinkie',
+    },
   ],
   friends: [
     { id: 'f1', name: 'arriq', src: '/friends/f1.jpg', caption: 'top 8 forever' },
@@ -168,15 +87,8 @@ export const profile: Profile = {
       id: 'g1',
       author: 'mossbox',
       date: 'Sep 12, 2026',
-      body: 'the scatter on the photos is doing the thing. feels like a bedroom wall. do not clean it up.',
-      replies: [
-        {
-          id: 'g1a',
-          author: 'das',
-          date: 'Sep 12, 2026',
-          body: 'that is the assignment. grain stays.',
-        },
-      ],
+      body: 'tapped my phone on your keychain and it did the thing. do not clean it up.',
+      replies: [{ id: 'g1a', author: 'das', date: 'Sep 12, 2026', body: 'that is the assignment. dither stays.' }],
     },
     {
       id: 'g2',
@@ -190,19 +102,61 @@ export const profile: Profile = {
       date: 'Sep 8, 2026',
       body: 'saw a Deftones poster on 19 that looked exactly like your album tile. coincidence is a kind of design.',
       replies: [
-        {
-          id: 'g3a',
-          author: 'humidkid',
-          date: 'Sep 8, 2026',
-          body: 'it is never a coincidence down here.',
-        },
-        {
-          id: 'g3b',
-          author: 'das',
-          date: 'Sep 9, 2026',
-          body: 'bring me the poster.',
-        },
+        { id: 'g3a', author: 'humidkid', date: 'Sep 8, 2026', body: 'it is never a coincidence down here.' },
+        { id: 'g3b', author: 'das', date: 'Sep 9, 2026', body: 'bring me the poster.' },
       ],
     },
   ],
+};
+
+export const pro: ProProfile = {
+  role: 'Web developer & design engineer',
+  availability: 'Open to small-business sites',
+  summary:
+    'I design and build websites for small businesses that don’t look like they came out of a template drawer — fast, hand-styled, and easy to keep running. On the side I build tools I want to exist.',
+  links: [
+    { id: 'mail', label: 'Email', href: 'mailto:hello@dasdev.net', icon: 'mail', detail: 'hello@dasdev.net' },
+    { id: 'www', label: 'Portfolio', href: 'https://dasdev.net', icon: 'globe', detail: 'dasdev.net' },
+    { id: 'gh', label: 'GitHub', href: 'https://github.com/DasVR', icon: 'github', detail: 'DasVR' },
+  ],
+  work: [
+    {
+      id: 'dasdev',
+      name: 'dasdev.net',
+      summary: 'Portfolio and studio front door. Client sites for small businesses.',
+      status: 'live',
+      meta: 'Studio',
+      href: 'https://dasdev.net',
+    },
+    {
+      id: 'nil',
+      name: 'NIL',
+      summary: 'A terminal-first workstation. Svelte 5, on-device, opinionated.',
+      status: 'building',
+      meta: 'Product',
+    },
+    {
+      id: 'routesim',
+      name: 'RouteSim',
+      summary: 'A simulation side project that keeps earning more weekends.',
+      status: 'building',
+      meta: 'Side project',
+    },
+    {
+      id: 'homelab',
+      name: 'Homelab',
+      summary: 'Self-hosted services and a Minecraft box that stays up through Florida storms.',
+      status: 'running',
+      meta: 'Infra',
+    },
+    {
+      id: 'card',
+      name: 'p.dasdev.net',
+      summary: 'This card. WebGL dithering, NFC tap-to-share, a vCard in one tap.',
+      status: 'live',
+      meta: 'Identity',
+    },
+  ],
+  capabilities: ['Marketing sites', 'Design systems', 'Front-end engineering', 'Motion & WebGL', 'Self-hosting'],
+  stack: ['SvelteKit', 'Svelte 5', 'TypeScript', 'WebGL', 'Node', 'Linux'],
 };

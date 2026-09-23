@@ -1,96 +1,76 @@
 <script lang="ts">
-  import ProfileTitle from '$lib/components/ProfileTitle.svelte';
-  import ProfileHeader from '$lib/components/ProfileHeader.svelte';
-  import ContactButtons from '$lib/components/ContactButtons.svelte';
-  import Blurb from '$lib/components/Blurb.svelte';
-  import InterestsTable from '$lib/components/InterestsTable.svelte';
-  import WidgetGrid from '$lib/components/WidgetGrid.svelte';
-  import PhotoScatter from '$lib/components/PhotoScatter.svelte';
-  import PlaylistWidget from '$lib/components/PlaylistWidget.svelte';
-  import BlinkieRow from '$lib/components/BlinkieRow.svelte';
-  import FriendGrid from '$lib/components/FriendGrid.svelte';
+  import ContactCard from '$lib/components/ContactCard.svelte';
+  import DefinitionList from '$lib/components/DefinitionList.svelte';
   import Guestbook from '$lib/components/Guestbook.svelte';
-  import ProfileFooter from '$lib/components/ProfileFooter.svelte';
-  import { profileState } from '$lib/profile.svelte.ts';
-
-  const data = $derived(profileState.data);
+  import NowPlaying from '$lib/components/NowPlaying.svelte';
+  import Roll from '$lib/components/Roll.svelte';
+  import Section from '$lib/components/Section.svelte';
+  import SiteFooter from '$lib/components/SiteFooter.svelte';
+  import Split from '$lib/components/Split.svelte';
+  import TopFriends from '$lib/components/TopFriends.svelte';
+  import { app } from '$lib/app.svelte.ts';
+  import { casual, identity } from '$lib/data/profile';
+  import { assetUrl } from '$lib/utils/urls';
 </script>
 
-<main class="profile">
-  <ProfileTitle name={data.displayName} />
+<svelte:head>
+  <title>{identity.name} · {identity.host}</title>
+  <meta name="description" content="{identity.name} — {casual.tagline}. Tap to save the contact." />
+  <meta property="og:title" content="{identity.name} · {identity.host}" />
+  <meta property="og:description" content={casual.tagline} />
+  <meta property="og:image" content={assetUrl(identity.avatar.src)} />
+</svelte:head>
 
-  <div class="columns">
-    <div class="col-left stack">
-      <ProfileHeader
-        src={data.avatar.src}
-        alt={data.avatar.alt}
-        mood={data.mood}
-        lastLogin={data.lastLogin}
-        location={data.location}
-        username={data.username}
-        tags={data.tags}
-      />
-      <ContactButtons actions={data.contacts} />
-    </div>
-    <div class="col-right stack">
-      <Blurb
-        title="About me"
-        body={data.about}
-        editing={profileState.editing}
-        onChange={(value) => profileState.setAbout(value)}
-      />
-      <Blurb
-        title="Who I'd like to meet"
-        body={data.meet}
-        editing={profileState.editing}
-        onChange={(value) => profileState.setMeet(value)}
-      />
-      <WidgetGrid widgets={data.widgets} />
-    </div>
-  </div>
-
-  <div class="stack rest">
-    <InterestsTable rows={data.interests} />
-    <PhotoScatter photos={data.photos} />
-    <PlaylistWidget
-      title={data.playlist.title}
-      artist={data.playlist.artist}
-      art={data.playlist.art}
-      tracks={data.playlist.tracks}
+<Split>
+  {#snippet card()}
+    <ContactCard
+      mode="casual"
+      {identity}
+      headline={casual.tagline}
+      status={casual.status}
+      links={casual.links}
+      facts={[
+        { label: 'Where', value: identity.location },
+        { label: 'Last seen', value: casual.lastSeen },
+      ]}
     />
-    <BlinkieRow blinkies={data.blinkies} />
-    <FriendGrid friends={data.friends} />
-    <Guestbook entries={data.guestbook} />
-    <ProfileFooter count={profileState.visitorCount} memberSince={data.memberSince} />
-  </div>
-</main>
+  {/snippet}
+
+  <Section index="01" title="About">
+    <p class="about">{casual.about}</p>
+  </Section>
+
+  <Section index="02" title="Now playing">
+    {#snippet aside()}{casual.playlist.tracks.length} tracks{/snippet}
+    <NowPlaying {...casual.playlist} />
+  </Section>
+
+  <Section index="03" title="Roll">
+    {#snippet aside()}press to develop{/snippet}
+    <Roll photos={casual.roll} />
+  </Section>
+
+  <Section index="04" title="Interests">
+    <DefinitionList rows={casual.interests} />
+  </Section>
+
+  <Section index="05" title="Top 8">
+    <TopFriends friends={casual.friends} />
+  </Section>
+
+  <Section index="06" title="Guestbook">
+    {#snippet aside()}{app.guestbook.length} entries{/snippet}
+    <Guestbook />
+  </Section>
+
+  <SiteFooter mode="casual" host={identity.host} since={casual.memberSince} />
+</Split>
 
 <style>
-  .profile {
-    display: grid;
-    gap: var(--s-4);
-  }
-
-  .stack {
-    display: grid;
-    gap: var(--s-4);
-    align-content: start;
-  }
-
-  .columns {
-    display: grid;
-    grid-template-columns: var(--left-col) 1fr;
-    gap: var(--s-4);
-    align-items: start;
-  }
-
-  .rest {
-    overflow: visible;
-  }
-
-  @media (max-width: 800px) {
-    .columns {
-      grid-template-columns: 1fr;
-    }
+  .about {
+    font-size: var(--t-lead);
+    line-height: 1.6;
+    color: var(--color-ink);
+    text-wrap: pretty;
   }
 </style>

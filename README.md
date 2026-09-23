@@ -3,13 +3,20 @@
 The chat that built this page is archived in [`docs/claude/`](docs/claude/README.md):
 brief, zip, inspirations, pull requests, and what is still open.
 
-Personal profile for **p.dasdev.net** — a 2007 SpaceHey page crossed with a
-gig flyer. Torn paper, grain, halftone, stencil type, a rare glitch on the
-name. Not cyberpunk. Not glassy.
+Personal contact card for **p.dasdev.net**. Tap an NFC tag (or scan a QR
+code), tap the notification, and the card drops in out of a Dynamic
+Island–style pill while a dithered WebGL wave rolls down the screen. Save the
+contact as a vCard in one tap.
 
-Built with SvelteKit + Svelte 5 (runes) + TypeScript. Hand-styled. Static
-adapter. Conventions follow `DasVR/NIL` (runes, token file, exhaustive
-switches, no inline hex in components).
+- `/` — casual: night palette, the SpaceHey profile carried forward
+- `/pro/` — pro: paper palette, work and contact
+- `/tags/` — QR codes and NFC URLs, with Web NFC writing on Android
+- `/das.vcf`, `/das-pro.vcf` — prerendered contact cards
+
+Design notes: [`docs/claude/redesign-tap-card.md`](docs/claude/redesign-tap-card.md).
+
+Built with SvelteKit + Svelte 5 (runes) + TypeScript. Hand-styled, no
+framework CSS. Static adapter. Conventions follow `DasVR/NIL`.
 
 ## Develop
 
@@ -53,23 +60,21 @@ deploy failed with 404 until Pages is enabled:
 The repo is private. GitHub Pages on a private repo needs GitHub Pro/Team,
 or make the repo public, or the preview is only visible to collaborators.
 
-## Casual / pro
+## NFC tags
 
-The toggle in the nav writes `data-theme="casual" | "pro"` on `<html>`.
-Casual is the grunge profile. Pro is a separate clean portfolio skin using
-the same content.
+Write an NDEF URL record per tag:
 
-## Adding photos
+- casual: `https://p.dasdev.net/?via=nfc`
+- pro: `https://p.dasdev.net/pro/?via=nfc`
 
-Drop files in `static/photos/` and append an object to `photos` in
-`src/lib/data/profile.ts`:
+`/tags/` shows the exact URLs for whatever host it is served from, plus QR
+codes (`?via=qr`). Android Chrome can write tags from that page; on iPhone use
+an app such as NFC Tools. iPhone XS and newer read tags in the background
+while unlocked and show a notification; tapping it opens the card.
 
-```ts
-{ src: '/photos/your-shot.jpg', alt: '…', rotate: -2, left: '10%', top: '12%', width: '36%', z: 3 }
-```
+## Content and photos
 
-`PhotoScatter.svelte` applies grain, contrast, halftone, and the rotation.
-No per-image retouching.
-
-Click `[edit]` on the profile name to change blurbs, mood, and widgets in
-the page. Guestbook signatures and widgets persist in `localStorage`.
+All copy is in `src/lib/data/profile.ts` (`identity`, `casual`, `pro`).
+Drop photos in `static/photos/` and reference them there; every image is
+dithered at runtime in the mode's colours, so nothing needs retouching.
+Guestbook signatures persist in `localStorage`.

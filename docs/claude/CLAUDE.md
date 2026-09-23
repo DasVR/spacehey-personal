@@ -5,7 +5,13 @@ Standing context for any Claude (or Cursor) session that touches
 folder. `.claude/CLAUDE.md` points here when this directory is the project
 root.
 
-## What this is
+> **Current direction (23 Sep 2026): the tap card.** The UI was redesigned
+> from scratch as an NFC/QR contact card with a WebGL dithered field and two
+> routes (`/` casual, `/pro/` pro). Read [redesign-tap-card.md](redesign-tap-card.md)
+> first. The sections below describe the SpaceHey build that came before; its
+> content lives on in the casual card, its layout rules do not.
+
+## What this was
 
 A 2007 SpaceHey / MySpace profile crossed with a Nirvana / Deftones gig
 flyer, for **p.dasdev.net**. Dark, textured, a little chaotic, alive.
@@ -46,6 +52,6 @@ grid, interests in the right column.
 
 ## Read next
 
-[conversation.md](conversation.md), [inspirations.md](inspirations.md),
+[redesign-tap-card.md](redesign-tap-card.md), [conversation.md](conversation.md), [inspirations.md](inspirations.md),
 [shipped.md](shipped.md), [layout-and-tokens.md](layout-and-tokens.md),
 [not-done.md](not-done.md), [verification.md](verification.md).

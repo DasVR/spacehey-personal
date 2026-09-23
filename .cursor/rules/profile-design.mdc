@@ -1,62 +1,33 @@
 ---
-description: Y2K / grunge profile design language for p.dasdev.net. Hand-styled SpaceHey × gig flyer. No Tailwind.
+description: Tap-card design language for p.dasdev.net. NFC/QR contact card, WebGL dithering, casual + pro routes.
 globs: ["**/*.svelte", "**/*.css", "**/*.ts"]
 alwaysApply: true
 ---
 
-# Profile design language
+# p.dasdev.net — the tap card
 
-A 2007 SpaceHey/MySpace profile crossed with a Nirvana/Deftones gig flyer:
-torn paper, grain, halftone, spray stencil type, restrained glitch. Not
-cyberpunk. Not glassy. Dark, textured, a little chaotic, alive.
+Full brief: `docs/claude/redesign-tap-card.md`. Summary:
 
-## Stack
-
-SvelteKit + Svelte 5 runes (`$state`, `$derived`, `$effect`) + TypeScript.
-Static adapter. No CSS framework.
+- A contact card you receive from an NFC tag or QR code. `?via=nfc|qr` plays
+  the arrival (island → dither wave → card grows out of the island).
+- `/` casual (night: black / cream / red), `/pro/` pro (paper / graphite / clay).
+- One WebGL field (`src/lib/gl/field.ts`), Bayer-dithered, low-res + pixelated.
+  Photos go through `DitherImage.svelte`.
+- `/das.vcf`, `/das-pro.vcf` are prerendered vCards. `/tags/` holds QR + NFC URLs.
 
 ## Svelte 5 (from NIL)
 
-- Props: `let { ... }: Props = $props();` with an explicit `interface Props`.
-- No `export let`, no `$:` labels, no `on:click` — events are attributes.
-- Children use snippets, not slots.
-- Exhaustive `switch` over unions with a `never` default.
-- Imports stay at the top of the file.
+Runes only; `let { ... }: Props = $props()` with an `interface Props`; events
+as attributes; snippets not slots; exhaustive switches with a `never` default.
 
 ## Tokens
 
-Hex lives only in `src/lib/styles/tokens.css`. Components consume
-`var(--color-*)` / `var(--font-*)` / `var(--s-*)`. Locked core:
+Hex only in `src/lib/styles/tokens.css`. Components use `var(--color-*)`,
+`var(--font-*)`, `var(--s-*)`, `var(--r-*)`. Concentric radii:
+`--r-inner = --r-card - --r-card-pad`.
 
-```css
---font-display: 'Anton', Impact, sans-serif;
---font-body: 'Trebuchet MS', sans-serif;
---color-bg: #0d0b09;
---color-panel: #161310;
---color-ink: #d9d0c2;
---color-ink-dim: #8f8577;
---color-accent: #7a4a32;
---color-accent-bright: #b06a42;
-```
+## Motion
 
-Motion keyframes live in `src/lib/styles/motion.css`. Honor
-`prefers-reduced-motion`.
-
-## What makes it alive
-
-1. Real photos in `static/photos/`, referenced from `profile.ts` as
-   `{ src, alt, rotate, ... }` and treated automatically in `PhotoScatter`.
-2. Small ambient motion only: grain drift, rare name glitch (~7s), photo
-   parallax on pointer. Nothing looping wall-to-wall.
-3. Asymmetry: rotated tiles, bleed, uneven widget heights. Perfect alignment
-   is the tell that it is dead.
-
-## Themes
-
-`document.documentElement.dataset.theme` is `casual` | `pro`. Casual is this
-grunge page. Pro is a clean portfolio skin keyed off the same data.
-
-## Page is a layout file
-
-Content lives in `src/lib/data/profile.ts`. Components take props. Do not
-hardcode copy into markup.
+`cubic-bezier(0.2, 0, 0, 1)`; press `scale(0.96)`; icon swaps scale 0.25→1,
+blur 4px→0; name transition properties; reduced motion gets a still field and
+fades.
