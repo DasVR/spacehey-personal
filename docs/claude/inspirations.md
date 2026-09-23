@@ -40,7 +40,7 @@ not a git file.
 | `uploads/spacehey-v3-bw-red.html` | Locked black/white/red tokens. Document title `Arriq — Profile v2`. Barcode text `003 963 6663` |
 | `screenshots/recheck.png` | Target screenshot of the cream-card layout |
 | `.thumbnail` | Small preview of the same layout |
-| `uploads/Gemini_Generated_Image_elwctvelwctvelwc.jpg` | Gothic MySpace mood: black/white collage, barcodes, wings. Energy, not a 1:1 layout |
+| `uploads/Gemini_Generated_Image_elwctvelwctvelwc.jpg` | Gothic MySpace mood: black/white collage, barcodes, wings. Energy, not a 1:1 layout. Re-attached 2026-09-23 and saved at [assets/mood/gothic-grunge-myspace.jpg](assets/mood/gothic-grunge-myspace.jpg) |
 | `uploads/Gemini_Generated_Image_24trlz24trlz24tr (1).jpg` | Narrow wireframe: star tile background, social row, widgets beside interests |
 | `image-slot.js`, `support.js` | Design-component runtime. Not ported |
 
@@ -97,16 +97,12 @@ Social marks shipped: IG, X, DC, SP, GH, WWW.
 - A separate `StarField.svelte` (stars are a div in `+layout.svelte`)
 - The original rust tokens as the casual skin (they remain only as history)
 
-## Generated stand-in assets (in the Svelte repo, not the zip)
+## Generated stand-in assets
 
-- `static/photos/avatar.jpg`, `gig-lights.jpg`, `torn-flyer.jpg`,
-  `night-road.jpg`, `cassette.jpg`, `desk-glow.jpg`, `window-rain.jpg`
-- `static/album/gig-flyer-vol2.jpg`
-- `static/friends/f1.jpg`–`f8.jpg`
-- `static/favicon.svg`
-
-These are not real digicam shots. The prompt asked for real ones before
-the photo section was styled. They were never supplied.
+Same files as `static/`, copied into [assets/profile/](assets/profile/)
+so this folder has the bytes. They are not real digicam shots. The prompt
+asked for real ones before the photo section was styled. They were never
+supplied. The gallery is [assets/README.md](assets/README.md).
 
 ## Copy voice (pointers, not a second theme)
 

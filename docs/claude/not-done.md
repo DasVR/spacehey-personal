@@ -30,6 +30,10 @@ because the branch exists.
 - [ ] Real URLs for Instagram, X, Discord, and Spotify. They are homepages.
       GitHub is `https://github.com/DasVR`. Portfolio is `https://dasdev.net`.
 - [ ] The zip’s Gemini images were mood only. They were not placed on the page.
+      The gothic collage was re-attached and lives at
+      `docs/claude/assets/mood/gothic-grunge-myspace.jpg`.
+      Still missing from the zip: `recheck.png`, the narrow wireframe JPG,
+      and `Das Profile.dc.html`.
 
 ## Explicitly later
 

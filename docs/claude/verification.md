@@ -34,15 +34,10 @@ guestbook sign, playlist highlight, nav to blog / friends / layouts,
 mobile stack. Photo scatter overlapping Now Playing was found and fixed
 (`e03722f`).
 
-Artifacts from that pass (agent VM, not in git):
-
-- `profile_casual_top.webp`, `profile_contact_toast.webp`,
-  `profile_guestbook.webp`, `profile_interests_and_pics.webp`,
-  `profile_now_playing.webp`, `profile_photo_scatter.webp`,
-  `profile_pro_theme.webp`, `profile_pics_cleared.png`,
-  `profile_full_after_contain.png`
-- `profile_casual_pro_edit_guestbook.mp4`
-- `profile_interests_and_photo_scatter.mp4`
+Stills and recordings from that pass are in
+[assets/rust-skin/](assets/rust-skin/) and
+[assets/recordings/](assets/recordings/). Gallery:
+[assets/README.md](assets/README.md).
 
 ## Browser, cream skin (PR #3)
 
@@ -69,17 +64,11 @@ Screenshots then showed pro mode social marks in a dark color on black
 tiles. That was fixed. A second capture computed pro social mark colors
 as `rgb(255, 252, 247)` except the red SP tile, which stayed white.
 
-Artifacts:
-
-- `desktop_casual_top.png`, `desktop_casual_mid.png`, `desktop_casual_hero.png`
-- `desktop_after_edit.png`, `desktop_contact_toast.png`, `desktop_guestbook.png`
-- `desktop_pro_mode.png`, `desktop_pro_social.png`
-- `mobile_casual_top.png`, `mobile_casual_mid.png`
-- `cream_card_layout_browser_pass.mp4`
-
-Those files lived under `/opt/cursor/artifacts/` on the agent VM. They are
-not in either git repo. The PR body on PR #3 referenced the hero shot and
-the video.
+Stills are in [assets/cream-skin/](assets/cream-skin/). The pass
+recording is
+[assets/recordings/cream_card_layout_browser_pass.mp4](assets/recordings/cream_card_layout_browser_pass.mp4).
+Gallery: [assets/README.md](assets/README.md). PR #3’s body also
+referenced the hero shot and that video.
 
 ## What was not verified
 

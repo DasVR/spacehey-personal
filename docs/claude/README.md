@@ -14,6 +14,7 @@ This folder is the `.claude` project for the chat that built
 | [layout-and-tokens.md](layout-and-tokens.md) | Rust palette vs the zip’s cream-card palette |
 | [not-done.md](not-done.md) | Still open |
 | [verification.md](verification.md) | Checks and browser passes |
+| [assets/](assets/README.md) | Photos, screenshots, and recordings from the chat |
 
 The chat asked for this archive inside the docs repo (`DasVR/master-plan`).
 The cloud agent can push to `spacehey-personal` only, so the copy that
