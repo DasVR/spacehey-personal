@@ -107,9 +107,3 @@ canvas {
   }
 }
 
-/* Lets the island's ring animate its conic angle. */
-@property --spin {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}

@@ -647,25 +647,53 @@
     animation: lip 2.6s cubic-bezier(0.2, 0, 0, 1) both;
   }
 
-  .blob,
-  .face {
+  .blob {
     animation: drop 2.6s both;
   }
 
-  /* Contents live only while the island is open. */
-  .face > * {
-    animation: face-content 2.6s cubic-bezier(0.2, 0, 0, 1) both;
-  }
-
+  /*
+   * The face never changes size, so nothing inside it reflows mid-animation.
+   * It sits where the island opens and is revealed by a clip that grows from
+   * a pill to the full shape, in step with the blob underneath.
+   */
   .face {
+    top: calc(var(--anchor) + 50px);
+    width: var(--w);
+    height: 76px;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 10px;
-    overflow: hidden;
+    padding: 0 16px 0 13px;
     white-space: nowrap;
     color: oklch(0.97 0 0);
     background: none;
+    animation: face-clip 2.6s both;
+  }
+
+  /*
+   * Each piece slides in on its own beat (--d), then leaves a little faster
+   * in reverse order. Transform, opacity and blur only: compositor work, so
+   * it stays smooth while the goo filter repaints underneath.
+   */
+  .face > * {
+    --d: 0ms;
+    opacity: 0;
+    will-change: transform, opacity, filter;
+    animation:
+      piece-in 520ms cubic-bezier(0.2, 0, 0, 1) calc(700ms + var(--d)) forwards,
+      piece-out 200ms cubic-bezier(0.4, 0, 1, 1) calc(1840ms - var(--d) / 2) forwards;
+  }
+
+  .face > .island-avatar {
+    --d: 0ms;
+  }
+
+  .face > .island-text {
+    --d: 70ms;
+  }
+
+  .face > .island-rings {
+    --d: 140ms;
   }
 
   .island-avatar {
@@ -675,14 +703,20 @@
     height: 50px;
     padding: 2px;
     border-radius: 50%;
-    /* A ring of light chasing round the photo, like a live share. */
-    background: conic-gradient(from var(--spin, 0deg), var(--color-accent), oklch(1 0 0 / 0.1) 40%, var(--color-accent));
-    animation:
-      face-content 2.6s cubic-bezier(0.2, 0, 0, 1) both,
-      spin 1.6s linear infinite;
+  }
+
+  /* A ring of light chasing round the photo, like a live share. */
+  .island-avatar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(var(--color-accent), oklch(1 0 0 / 0.08) 40%, var(--color-accent));
+    animation: spin 1.6s linear infinite;
   }
 
   .island-avatar img {
+    position: relative;
     display: block;
     width: 100%;
     height: 100%;
@@ -695,6 +729,15 @@
     display: grid;
     min-width: 0;
     line-height: 1.15;
+  }
+
+  /* The name trails the kicker by a beat. */
+  .island-text > * {
+    animation: line-in 520ms cubic-bezier(0.2, 0, 0, 1) 770ms backwards;
+  }
+
+  .island-text > strong {
+    animation-delay: 830ms;
   }
 
   .island-kicker {
@@ -882,24 +925,51 @@
     }
   }
 
-  @keyframes face-content {
+  @keyframes face-clip {
     0%,
-    22% {
-      opacity: 0;
-      scale: 0.6;
-      filter: blur(6px);
+    20% {
+      clip-path: inset(0 calc((var(--w) - 126px) / 2) 39px round 20px);
     }
     34%,
-    72% {
+    76% {
+      clip-path: inset(0 0 0 round 38px);
+      animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    }
+    86%,
+    100% {
+      clip-path: inset(0 calc((var(--w) - 126px) / 2) 39px round 20px);
+    }
+  }
+
+  @keyframes piece-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.9);
+      filter: blur(4px);
+    }
+    to {
       opacity: 1;
-      scale: 1;
+      transform: none;
       filter: blur(0);
     }
-    80%,
-    100% {
+  }
+
+  @keyframes piece-out {
+    from {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+    to {
       opacity: 0;
-      scale: 0.6;
-      filter: blur(6px);
+      transform: translateY(-4px) scale(0.92);
+      filter: blur(4px);
+    }
+  }
+
+  @keyframes line-in {
+    from {
+      transform: translateY(5px);
     }
   }
 
@@ -927,7 +997,7 @@
 
   @keyframes spin {
     to {
-      --spin: 360deg;
+      rotate: 1turn;
     }
   }
 
@@ -958,7 +1028,7 @@
     }
 
     .island-rings i,
-    .island-avatar {
+    .island-avatar::before {
       animation: none;
     }
 
