@@ -25,6 +25,7 @@
     {/each}
   </nav>
   <div class="mode" role="group" aria-label="Profile mode">
+    <span class="indicator" class:pro={theme.mode === 'pro'}></span>
     <button
       type="button"
       class:on={theme.mode === 'casual'}
@@ -33,7 +34,6 @@
     >
       casual
     </button>
-    <span class="sep" aria-hidden="true">/</span>
     <button
       type="button"
       class:on={theme.mode === 'pro'}
@@ -47,22 +47,18 @@
 
 <style>
   .nav {
-    position: sticky;
-    top: 0;
-    z-index: var(--z-nav);
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
     align-items: center;
-    gap: var(--s-3);
-    padding: var(--s-3) 0 var(--s-4);
-    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-    backdrop-filter: blur(6px);
+    gap: var(--s-4);
+    padding: 14px 0;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--color-line-dark);
   }
 
   .brand {
     font-family: var(--font-display);
-    font-size: var(--t-lead);
-    letter-spacing: var(--track-display);
+    font-size: 15px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-ink);
     text-decoration: none;
@@ -78,13 +74,13 @@
 
   nav {
     display: flex;
-    gap: var(--s-3);
-    justify-content: center;
+    gap: 14px;
+    margin-right: auto;
     font-size: var(--t-meta);
   }
 
   nav a {
-    color: var(--color-ink-dim);
+    color: var(--color-red);
     text-decoration: none;
   }
 
@@ -94,39 +90,51 @@
   }
 
   .mode {
-    justify-self: end;
+    position: relative;
     display: flex;
     align-items: center;
-    gap: var(--s-1);
-    font-size: var(--t-meta);
+    background: var(--color-void);
+    border: 1px solid var(--color-line-dark);
+    border-radius: 999px;
+    padding: 2px;
+    font-size: 10px;
+  }
+
+  .indicator {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    width: calc(50% - 2px);
+    background: var(--color-red);
+    border-radius: 999px;
+    z-index: 0;
+    transition: left 280ms var(--ease-out);
+  }
+
+  .indicator.pro {
+    left: 50%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .indicator {
+      transition: none;
+    }
   }
 
   .mode button {
+    position: relative;
+    z-index: 1;
     background: none;
     border: 0;
-    padding: 0.15rem 0.2rem;
+    padding: 4px 10px;
+    border-radius: 999px;
     color: var(--color-ink-dim);
+    font: inherit;
+    transition: color 200ms ease;
   }
 
   .mode button.on {
-    color: var(--color-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .sep {
-    color: var(--color-ink-dim);
-  }
-
-  @media (max-width: 640px) {
-    .nav {
-      grid-template-columns: 1fr auto;
-      grid-template-areas:
-        'brand mode'
-        'links links';
-    }
-    .brand { grid-area: brand; }
-    nav { grid-area: links; justify-content: start; }
-    .mode { grid-area: mode; }
+    color: var(--color-on-red);
   }
 </style>

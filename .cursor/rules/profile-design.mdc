@@ -7,8 +7,12 @@ alwaysApply: true
 # Profile design language
 
 A 2007 SpaceHey/MySpace profile crossed with a Nirvana/Deftones gig flyer:
-torn paper, grain, halftone, spray stencil type, restrained glitch. Not
-cyberpunk. Not glassy. Dark, textured, a little chaotic, alive.
+cream cards on black, barcode ticks, grain, tiled stars, restrained glitch.
+Not cyberpunk. Not glassy.
+
+Layout source of truth: the uploaded `Das Profile.dc.html` Design Component
+(black page, cream panels, 280px left column, interests in the right column,
+social 3×2 grid, `[edit]` in the About header).
 
 ## Stack
 
@@ -26,18 +30,20 @@ Static adapter. No CSS framework.
 ## Tokens
 
 Hex lives only in `src/lib/styles/tokens.css`. Components consume
-`var(--color-*)` / `var(--font-*)` / `var(--s-*)`. Locked core:
+`var(--color-*)` / `var(--font-*)` / `var(--s-*)`. Locked casual core:
 
 ```css
 --font-display: 'Anton', Impact, sans-serif;
 --font-body: 'Trebuchet MS', sans-serif;
---color-bg: #0d0b09;
---color-panel: #161310;
---color-ink: #d9d0c2;
---color-ink-dim: #8f8577;
---color-accent: #7a4a32;
---color-accent-bright: #b06a42;
+--color-bg: #050505;
+--color-panel: #ece7dd;
+--color-panel-ink: #111111;
+--color-ink: #e8e4dc;
+--color-red: #e01b2e;
 ```
+
+`--color-ink` is cream text on black. Titles on cream panels use
+`--color-panel-ink`, never `--color-ink`.
 
 Motion keyframes live in `src/lib/styles/motion.css`. Honor
 `prefers-reduced-motion`.
@@ -46,15 +52,14 @@ Motion keyframes live in `src/lib/styles/motion.css`. Honor
 
 1. Real photos in `static/photos/`, referenced from `profile.ts` as
    `{ src, alt, rotate, ... }` and treated automatically in `PhotoScatter`.
-2. Small ambient motion only: grain drift, rare name glitch (~7s), photo
-   parallax on pointer. Nothing looping wall-to-wall.
-3. Asymmetry: rotated tiles, bleed, uneven widget heights. Perfect alignment
-   is the tell that it is dead.
+2. Small ambient motion only: grain drift, star field, rare name glitch (~7s),
+   photo parallax on pointer. Nothing looping wall-to-wall.
+3. Asymmetry: rotated polaroids, barcode ticks, uneven widget cards.
 
 ## Themes
 
 `document.documentElement.dataset.theme` is `casual` | `pro`. Casual is this
-grunge page. Pro is a clean portfolio skin keyed off the same data.
+black/white/red page. Pro is a clean portfolio skin keyed off the same data.
 
 ## Page is a layout file
 

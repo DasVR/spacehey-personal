@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import type { Blinkie } from '$lib/data/types';
 
   interface Props {
@@ -10,15 +9,15 @@
 </script>
 
 <section class="row">
-  <GrainLayer />
-  <h2 class="section-title">Blinkies</h2>
+  <h2 class="section-title on-void">Blinkies</h2>
   <ul>
-    {#each blinkies as blinkie (blinkie.id)}
+    {#each blinkies as blinkie, index (blinkie.id)}
+      {@const variant = index % 3}
       <li>
         {#if blinkie.href}
-          <a href={blinkie.href}>{blinkie.label}</a>
+          <a class="chip" class:paper={variant === 0} class:cream={variant === 1} class:hot={variant === 2} href={blinkie.href}>{blinkie.label}</a>
         {:else}
-          <span>{blinkie.label}</span>
+          <span class="chip" class:paper={variant === 0} class:cream={variant === 1} class:hot={variant === 2}>{blinkie.label}</span>
         {/if}
       </li>
     {/each}
@@ -27,11 +26,9 @@
 
 <style>
   .row {
-    position: relative;
-    overflow: hidden;
-    background: var(--color-bg);
+    background: var(--color-void);
     border: 1px solid var(--color-line);
-    padding: var(--s-3) var(--s-4);
+    padding: 14px var(--s-4);
   }
 
   ul {
@@ -43,32 +40,35 @@
     margin: 0;
   }
 
-  li span,
-  li a {
+  .chip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-width: 88px;
     height: 31px;
-    padding: 0 0.45rem;
+    padding: 0 8px;
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     text-decoration: none;
+  }
+
+  .paper {
     color: var(--color-paper);
     background: var(--color-void);
-    border: 1px solid var(--color-accent-bright);
-    box-shadow: inset 0 0 0 1px var(--color-accent);
+    border: 1px solid var(--color-red);
   }
 
-  li:nth-child(2n) span {
+  .cream {
     color: var(--color-void);
-    background: var(--color-accent-bright);
+    background: var(--color-ink);
+    border: 1px solid var(--color-red);
   }
 
-  li:nth-child(3n) span {
+  .hot {
     color: var(--color-ink);
-    background: var(--color-accent);
+    background: var(--color-red);
+    border: 1px solid var(--color-ink);
   }
 </style>

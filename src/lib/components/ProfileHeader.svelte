@@ -1,5 +1,4 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
   import { profileState } from '$lib/profile.svelte.ts';
   import type { Tag } from '$lib/data/types';
   import { assetUrl } from '$lib/utils/urls';
@@ -17,8 +16,7 @@
   let { src, alt, mood, lastLogin, location, username, tags }: Props = $props();
 </script>
 
-<section class="header torn-edge">
-  <GrainLayer />
+<section class="header">
   <div class="polaroid">
     <img src={assetUrl(src)} {alt} />
   </div>
@@ -47,9 +45,8 @@
 
 <style>
   .header {
-    position: relative;
     display: grid;
-    gap: var(--s-4);
+    gap: 14px;
     padding: var(--s-5) var(--s-4);
     background: var(--color-panel);
     border: 1px solid var(--color-line);
@@ -57,11 +54,19 @@
 
   .polaroid {
     justify-self: center;
-    width: min(100%, 13rem);
-    padding: 0.45rem 0.45rem 1.4rem;
+    width: min(100%, 11.25rem);
+    padding: 0.5rem 0.5rem 1.4rem;
     background: var(--color-paper);
     transform: rotate(-2.4deg);
     box-shadow: 2px 3px 6px var(--color-shadow);
+    transition:
+      transform 220ms var(--ease-out),
+      box-shadow 220ms ease;
+  }
+
+  .polaroid:hover {
+    transform: rotate(-1deg) scale(1.03);
+    box-shadow: 3px 5px 10px var(--color-shadow);
   }
 
   .polaroid img {
@@ -74,36 +79,40 @@
 
   .handle {
     font-family: var(--font-display);
-    font-size: var(--t-head);
+    font-size: 20px;
     letter-spacing: var(--track-display);
     text-transform: uppercase;
+    color: var(--color-panel-ink);
+    margin: 0 0 6px;
   }
 
   .mood {
-    color: var(--color-accent-bright);
+    color: var(--color-red);
     font-style: italic;
+    margin: 0 0 6px;
+    font-size: 13px;
   }
 
   .dim {
-    color: var(--color-ink-dim);
+    color: var(--color-panel-ink-dim);
     font-size: var(--t-meta);
   }
 
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s-2);
+    gap: 6px;
     list-style: none;
     padding: 0;
-    margin: var(--s-3) 0 0;
+    margin: 10px 0 0;
   }
 
   .tags li {
-    border: 1px solid var(--color-accent);
-    color: var(--color-ink);
-    padding: 0.1rem 0.45rem;
-    font-size: var(--t-micro);
-    letter-spacing: var(--track-tick);
+    border: 1px solid var(--color-panel-ink);
+    color: var(--color-panel-ink);
+    padding: 2px 9px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     border-radius: 999px;
   }
@@ -114,13 +123,14 @@
   }
 
   .mood-edit input {
-    background: var(--color-bg);
-    border: 1px solid var(--color-line-hot);
+    background: var(--color-void);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-dark);
     padding: var(--s-2);
   }
 
-  :global([data-theme='pro']) .polaroid {
-    transform: none;
+  :global([data-theme='pro']) .polaroid,
+  :global([data-theme='pro']) .polaroid:hover {
     transform: none;
     background: var(--color-panel);
     padding: 0;
