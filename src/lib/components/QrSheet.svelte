@@ -17,7 +17,11 @@
   // Keep the native <dialog> in sync with `open` (focus trap + Esc for free).
   $effect(() => {
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      dialog.focus();
+      document.documentElement.classList.add('locked');
+    }
     if (!open && dialog.open) dialog.close();
   });
 </script>
@@ -31,7 +35,11 @@
   bind:this={dialog}
   class="sheet"
   aria-labelledby="qr-title"
-  onclose={onclose}
+  tabindex="-1"
+  onclose={() => {
+    document.documentElement.classList.remove('locked');
+    onclose();
+  }}
   onclick={(e) => {
     if (e.target === dialog) onclose();
   }}
@@ -65,6 +73,7 @@
     background: transparent;
     color: var(--color-ink);
     overflow: visible;
+    outline: none;
   }
 
   .sheet::backdrop {
