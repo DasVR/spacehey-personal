@@ -25,7 +25,6 @@ export const casual: CasualProfile = {
   memberSince: 'Jan 20, 2007',
   about:
     'I build for small businesses and for myself — NIL, a Minecraft box that stays up, RouteSim, this page. Florida humidity on the windows, analog cameras in a drawer, old web in the bookmarks. A room with the lights down and a flyer on the wall.',
-  meet: 'People who still leave comments. Band kids who grew into operators. Anyone who will sit with a half-broken layout until it feels like a place.',
   links: [
     { id: 'ig', label: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
     { id: 'x', label: 'X', href: 'https://x.com/', icon: 'x' },

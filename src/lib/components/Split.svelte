@@ -4,14 +4,12 @@
   interface Props {
     card: Snippet;
     children: Snippet;
-    /** Let the content column use the full width (bento layouts). */
-    wide?: boolean;
   }
 
-  let { card, children, wide = false }: Props = $props();
+  let { card, children }: Props = $props();
 </script>
 
-<main class="split" class:wide>
+<main class="split">
   <div class="card-col">{@render card()}</div>
   <div class="content">{@render children()}</div>
 </main>
@@ -44,15 +42,12 @@
       padding-top: var(--s-2);
       margin-inline: 0;
     }
+  }
 
-    .wide .content {
-      max-width: none;
-    }
-
-    /* The card is sized to the viewport (see ContactCard), so it can always stick. */
+  @media (min-width: 960px) and (min-height: 940px) {
     .card-col {
       position: sticky;
-      top: var(--s-4);
+      top: var(--s-5);
     }
   }
 </style>
