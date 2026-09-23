@@ -11,14 +11,19 @@ during the layout pass. It is not on the agent disk anymore, so these
 files from inside it are **not** in git:
 
 - `screenshots/recheck.png` and `.thumbnail`
-- `uploads/Gemini_Generated_Image_elwctvelwctvelwc.jpg`
-- `uploads/Gemini_Generated_Image_24trlz24trlz24tr (1).jpg`
+- `uploads/Gemini_Generated_Image_24trlz24trlz24tr (1).jpg` (the narrow wireframe)
 - `Das Profile.dc.html`
 - `uploads/spacehey-v3-bw-red.html`
 - `github.md`, `image-slot.js`, `support.js`
 
-What those files contained is written up in [../inspirations.md](../inspirations.md).
-Re-attach the zip if you want those binaries in this folder.
+The other Gemini board was re-attached on 2026-09-23 and is saved below.
+What the missing files contained is written up in [../inspirations.md](../inspirations.md).
+
+## Mood board (re-attached)
+
+Black-and-white gothic MySpace collage. Mood only: halftone, scratches, barcodes, wings, a dense friend grid, a music panel. It is not the cream-card layout, and it is not a 1:1 spec. The Monster mark and the garbled “Blurbs” / “Interests” type are part of the reference image, not copy to ship.
+
+![Gothic grunge MySpace mood](mood/gothic-grunge-myspace.jpg)
 
 ## Profile photos used on the page
 

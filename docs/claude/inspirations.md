@@ -40,7 +40,7 @@ not a git file.
 | `uploads/spacehey-v3-bw-red.html` | Locked black/white/red tokens. Document title `Arriq — Profile v2`. Barcode text `003 963 6663` |
 | `screenshots/recheck.png` | Target screenshot of the cream-card layout |
 | `.thumbnail` | Small preview of the same layout |
-| `uploads/Gemini_Generated_Image_elwctvelwctvelwc.jpg` | Gothic MySpace mood: black/white collage, barcodes, wings. Energy, not a 1:1 layout |
+| `uploads/Gemini_Generated_Image_elwctvelwctvelwc.jpg` | Gothic MySpace mood: black/white collage, barcodes, wings. Energy, not a 1:1 layout. Re-attached 2026-09-23 and saved at [assets/mood/gothic-grunge-myspace.jpg](assets/mood/gothic-grunge-myspace.jpg) |
 | `uploads/Gemini_Generated_Image_24trlz24trlz24tr (1).jpg` | Narrow wireframe: star tile background, social row, widgets beside interests |
 | `image-slot.js`, `support.js` | Design-component runtime. Not ported |
 
