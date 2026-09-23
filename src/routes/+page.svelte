@@ -1,17 +1,23 @@
 <script lang="ts">
   import ContactCard from '$lib/components/ContactCard.svelte';
-  import DitherImage from '$lib/components/DitherImage.svelte';
-  import DefinitionList from '$lib/components/DefinitionList.svelte';
+  import GiscusThread from '$lib/components/GiscusThread.svelte';
   import Guestbook from '$lib/components/Guestbook.svelte';
-  import NowPlaying from '$lib/components/NowPlaying.svelte';
+  import InterestPicker from '$lib/components/InterestPicker.svelte';
   import Roll from '$lib/components/Roll.svelte';
   import Section from '$lib/components/Section.svelte';
   import SiteFooter from '$lib/components/SiteFooter.svelte';
   import Split from '$lib/components/Split.svelte';
   import TopFriends from '$lib/components/TopFriends.svelte';
+  import VinylCrate from '$lib/components/VinylCrate.svelte';
   import { app } from '$lib/app.svelte.ts';
+  import music from '$lib/data/music.json';
   import { casual, identity } from '$lib/data/profile';
+  import type { Crate } from '$lib/data/types';
+  import { roll } from '$lib/roll';
   import { assetUrl } from '$lib/utils/urls';
+
+  const crate = music as Crate;
+  const giscusReady = Boolean(casual.giscus.repoId && casual.giscus.categoryId);
 </script>
 
 <svelte:head>
@@ -28,7 +34,9 @@
       mode="casual"
       {identity}
       headline={casual.tagline}
-      status={casual.status}
+      status={casual.statuses[0]?.text ?? ''}
+      statuses={casual.statuses}
+      timezone={casual.timezone}
       links={casual.links}
       facts={[
         { label: 'Where', value: identity.location },
@@ -41,23 +49,18 @@
     <p class="about">{casual.about}</p>
   </Section>
 
-  <Section index="02" title="Now playing">
-    {#snippet aside()}{casual.playlist.tracks.length} tracks{/snippet}
-    <NowPlaying {...casual.playlist} />
+  <Section index="02" title="The crate">
+    {#snippet aside()}{crate.tracks.length} records · Apple Music{/snippet}
+    <VinylCrate {crate} />
   </Section>
 
   <Section index="03" title="Roll">
-    {#snippet aside()}press to develop{/snippet}
-    <Roll photos={casual.roll} />
+    {#snippet aside()}{roll.length} photos · tap to open{/snippet}
+    <Roll photos={roll} />
   </Section>
 
-  <figure class="wall">
-    <div class="wall-frame"><DitherImage src={casual.wall.src} alt={casual.wall.alt} cell={2} /></div>
-    <figcaption><span>mood board</span> press to develop</figcaption>
-  </figure>
-
   <Section index="04" title="Interests">
-    <DefinitionList rows={casual.interests} />
+    <InterestPicker groups={casual.interests} />
   </Section>
 
   <Section index="05" title="Top 8">
@@ -65,39 +68,18 @@
   </Section>
 
   <Section index="06" title="Guestbook">
-    {#snippet aside()}{app.guestbook.length} entries{/snippet}
-    <Guestbook />
+    {#snippet aside()}{giscusReady ? 'signed in with GitHub' : `${app.guestbook.length} entries`}{/snippet}
+    {#if giscusReady}
+      <GiscusThread config={casual.giscus} />
+    {:else}
+      <Guestbook />
+    {/if}
   </Section>
 
   <SiteFooter mode="casual" host={identity.host} since={casual.memberSince} />
 </Split>
 
 <style>
-  .wall {
-    display: grid;
-    gap: var(--s-2);
-  }
-
-  .wall-frame {
-    aspect-ratio: 902 / 1024;
-    max-height: 80vh;
-    border-radius: 20px;
-    overflow: hidden;
-    outline: 1px solid var(--img-outline);
-    outline-offset: -1px;
-  }
-
-  .wall figcaption {
-    font-family: var(--font-mono);
-    font-size: var(--t-micro);
-    color: var(--color-ink-faint);
-  }
-
-  .wall figcaption span {
-    color: var(--color-accent);
-    margin-right: var(--s-2);
-  }
-
   .about {
     font-size: var(--t-lead);
     line-height: 1.6;

@@ -75,6 +75,33 @@ while unlocked and show a notification; tapping it opens the card.
 ## Content and photos
 
 All copy is in `src/lib/data/profile.ts` (`identity`, `casual`, `pro`).
-Drop photos in `static/photos/` and reference them there; every image is
-dithered at runtime in the mode's colours, so nothing needs retouching.
-Guestbook signatures persist in `localStorage`.
+
+- **Status:** `casual.statuses`, newest first. Visitors tap the pill to flip
+  back through them.
+- **The crate (Apple Music):** list songs in `src/lib/data/playlist.json`,
+  then run `npm run music`. It looks each one up on Apple and writes
+  `music.json` with the real album artwork, a 30-second preview and the
+  Apple Music link. Put the playlist's share link in `appleMusicUrl`.
+- **Roll:** drop photos into `src/lib/roll/` named
+  `YYYY-MM-DD--a-caption.jpg`, or use **`/roll/add/`** on the site: it
+  upscales or resizes, sharpens, strips location data, previews the dither
+  and opens GitHub's uploader for that folder.
+- **Top 8:** give a friend `social: { platform, handle }` and their real
+  profile picture is pulled in (Instagram, X, GitHub, TikTok, Bluesky,
+  YouTube, Twitch). Without it they get a colour tile.
+- **Guestbook:** runs on GitHub Discussions through [giscus](https://giscus.app)
+  once it's switched on (see below). Until then it falls back to a
+  this-device-only book.
+
+### Turning on the guestbook
+
+1. Repo **Settings → General → Features → Discussions** on.
+2. Create a Discussion category called **Guestbook** (type: Announcement,
+   so only you can start threads; visitors still comment).
+3. Install the [giscus app](https://github.com/apps/giscus) on this repo.
+4. On [giscus.app](https://giscus.app), enter `DasVR/spacehey-personal`,
+   pick the Guestbook category, and copy `data-repo-id` and
+   `data-category-id` into `casual.giscus` in `profile.ts`.
+
+Visitors sign in with GitHub, react, reply, and attach images with
+Markdown; you moderate (hide, delete, lock, block) from GitHub.

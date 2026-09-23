@@ -5,9 +5,12 @@
   import CopyButton from './CopyButton.svelte';
   import DitherImage from './DitherImage.svelte';
   import Icon from './Icon.svelte';
+  import QrSheet from './QrSheet.svelte';
+  import StatusPill from './StatusPill.svelte';
   import { app } from '$lib/app.svelte.ts';
   import { arrivalLabel, arrivalSource, type ArrivalSource } from '$lib/arrival';
-  import type { Identity, Link, Mode } from '$lib/data/types';
+  import type { Identity, Link, Mode, Status } from '$lib/data/types';
+  import { hourOffset, localTime } from '$lib/utils/time';
   import { assetUrl, pageHref } from '$lib/utils/urls';
 
   interface Props {
@@ -19,9 +22,24 @@
     links: Link[];
     /** Short meta rows under the headline. */
     facts: { label: string; value: string }[];
+    /** Casual: recent statuses, newest first. */
+    statuses?: Status[];
+    /** IANA zone for the live local-time row. */
+    timezone?: string;
   }
 
-  let { mode, identity, headline, status, links, facts }: Props = $props();
+  let { mode, identity, headline, status, links, facts, statuses, timezone }: Props = $props();
+
+  let qrOpen = $state(false);
+  let now = $state(Date.now());
+
+  /** "3:12 PM" plus how far that is from the visitor. */
+  const clock = $derived.by(() => {
+    if (!timezone) return null;
+    const off = hourOffset(timezone, now);
+    const rel = off === 0 ? 'same as you' : `${off > 0 ? '+' : '−'}${Math.abs(off)}h from you`;
+    return { time: localTime(timezone, now), rel };
+  });
 
   let card: HTMLElement;
   let source = $state<ArrivalSource | null>(null);
@@ -35,6 +53,7 @@
   let host = $state('');
 
   onMount(() => {
+    const tick = window.setInterval(() => (now = Date.now()), 30_000);
     shareUrl = new URL(pageHref(path), window.location.origin).href;
     host = window.location.host;
     const root = document.documentElement;
@@ -63,6 +82,7 @@
     });
     io.observe(card);
     return () => {
+      window.clearInterval(tick);
       window.clearTimeout(settle);
       io.disconnect();
     };
@@ -189,8 +209,8 @@
 
     <div class="body">
       <p class="headline" style="--i: 1">{headline}</p>
-      {#if mode === 'casual'}
-        <p class="status" style="--i: 2"><span class="dot"></span><span class="status-label">mood</span> {status}</p>
+      {#if mode === 'casual' && statuses?.length}
+        <div style="--i: 2"><StatusPill {statuses} /></div>
       {/if}
 
       <dl class="facts" style="--i: 2">
@@ -200,6 +220,12 @@
             <dd>{fact.value}</dd>
           </div>
         {/each}
+        {#if clock}
+          <div>
+            <dt>Local time</dt>
+            <dd class="clock"><Icon name="clock" size={14} /> {clock.time} <span>{clock.rel}</span></dd>
+          </div>
+        {/if}
       </dl>
 
       <div class="actions" style="--i: 3">
@@ -209,6 +235,9 @@
         </a>
         <button type="button" class="btn icon press" onclick={share} aria-label="Share">
           <Icon name="share" size={18} stroke={2} />
+        </button>
+        <button type="button" class="btn icon press" onclick={() => (qrOpen = true)} aria-label="Show QR code">
+          <Icon name="qr" size={18} stroke={2} />
         </button>
         <CopyButton value={shareUrl} label="Copy link" done="Link copied" />
       </div>
@@ -234,6 +263,8 @@
   <span>Save {identity.name}</span>
   <Icon name="contact" size={16} stroke={2} />
 </a>
+
+<QrSheet open={qrOpen} url={shareUrl ? `${shareUrl}?via=qr` : ''} name={identity.name} onclose={() => (qrOpen = false)} />
 
 <style>
   /* ---------- stage & card ---------- */
@@ -424,24 +455,6 @@
     margin-top: calc(-1 * var(--s-2));
   }
 
-  .status {
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    font-size: var(--t-body);
-    color: var(--color-accent);
-    font-style: italic;
-  }
-
-  .status-label {
-    font-family: var(--font-mono);
-    font-style: normal;
-    font-size: var(--t-micro);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-ink-faint);
-  }
-
   .dot {
     width: 7px;
     height: 7px;
@@ -478,6 +491,18 @@
     align-self: center;
   }
 
+  .clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .clock span {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
+  }
+
   .facts dd {
     color: var(--color-ink);
     text-align: right;
@@ -488,7 +513,7 @@
 
   .actions {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     gap: var(--s-2);
     align-items: center;
   }
