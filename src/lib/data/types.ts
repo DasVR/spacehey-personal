@@ -77,6 +77,8 @@ export interface CasualProfile {
   about: string;
   links: Link[];
   roll: Image[];
+  /** Full-bleed mood board, dithered like everything else. */
+  wall: Image;
   playlist: { title: string; artist: string; art: Image; tracks: Track[] };
   interests: Interest[];
   friends: Friend[];
