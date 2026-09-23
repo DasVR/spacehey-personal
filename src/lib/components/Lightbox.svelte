@@ -22,7 +22,13 @@
 
   $effect(() => {
     if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
+    if (index !== null && !dialog.open) {
+      dialog.showModal();
+      // Focus the viewer itself, not the close button (iOS draws a ring on it).
+      dialog.focus();
+      // Freeze the page underneath so it can't scroll behind the viewer.
+      document.documentElement.classList.add('locked');
+    }
     if (index === null && dialog.open) dialog.close();
   });
 
@@ -43,7 +49,11 @@
   bind:this={dialog}
   class="lightbox"
   aria-label={photo?.caption ?? 'Photo'}
-  onclose={onclose}
+  tabindex="-1"
+  onclose={() => {
+    document.documentElement.classList.remove('locked');
+    onclose();
+  }}
   onkeydown={onKey}
 >
   {#if photo}
@@ -110,10 +120,13 @@
     max-width: none;
     max-height: none;
     margin: 0;
-    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    /* Clear of the status bar, where iOS blurs whatever sits underneath. */
+    padding: calc(env(safe-area-inset-top) + 28px) 12px max(12px, env(safe-area-inset-bottom));
+    outline: none;
+    overscroll-behavior: contain;
     border: 0;
     color: var(--dither-light);
-    background: oklch(0.06 0 0 / 0.96);
+    background: oklch(0.06 0 0);
   }
 
   .lightbox[open] {
