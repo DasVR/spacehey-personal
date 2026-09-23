@@ -1,0 +1,79 @@
+{
+  "title": "Gig Flyer Vol. 2",
+  "curator": "Arriq",
+  "appleMusicUrl": "",
+  "tracks": [
+    {
+      "id": "1537631475",
+      "title": "Change (In the House of Flies)",
+      "artist": "Deftones",
+      "album": "White Pony (20th Anniversary Deluxe Edition)",
+      "year": "2000",
+      "genre": "Hard Rock",
+      "duration": "5:00",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f2/74/8c/f2748c3d-ca8c-75ac-f9fc-32f333aed8bd/093624893097.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c8/ea/b7/c8eab780-6d3f-5a94-009e-cb9a000a751d/mzaf_13886781352672367176.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/change-in-the-house-of-flies/1537631309?i=1537631475&uo=4"
+    },
+    {
+      "id": "1440859107",
+      "title": "Heart-Shaped Box",
+      "artist": "Nirvana",
+      "album": "In Utero (20th Anniversary Edition)",
+      "year": "1993",
+      "genre": "Alternative",
+      "duration": "4:41",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e3/20/03/e32003a4-99bc-1c70-40ba-001882f35dba/00602537526840.rgb.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2c/ca/31/2cca3150-0c98-20d7-32be-59f68c877ae6/mzaf_11272169685381281291.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/heart-shaped-box/1440858699?i=1440859107&uo=4"
+    },
+    {
+      "id": "1099843334",
+      "title": "Be Quiet and Drive (Far Away)",
+      "artist": "Deftones",
+      "album": "Around the Fur",
+      "year": "1997",
+      "genre": "Hard Rock",
+      "duration": "5:08",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/27/cb/b4/27cbb40e-f8c6-dede-9c69-62089a873fa9/093624919803.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/82/8b/a2/828ba269-81af-dc56-d8a2-fa712a02dd02/mzaf_10134856389145791661.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/be-quiet-and-drive-far-away/1099843198?i=1099843334&uo=4"
+    },
+    {
+      "id": "913726110",
+      "title": "Bloodhail",
+      "artist": "Have A Nice Life",
+      "album": "Deathconsciousness",
+      "year": "2008",
+      "genre": "Alternative",
+      "duration": "5:38",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/dd/6f/aa/dd6faa7e-c8be-2cca-30b9-678405e978b6/723175699267.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/36/f9/9636f956-246d-bfa6-9dd0-9fa39b8f7bbd/mzaf_5139944840910240395.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/bloodhail/913726094?i=913726110&uo=4"
+    },
+    {
+      "id": "292885262",
+      "title": "When the Sun Hits",
+      "artist": "Slowdive",
+      "album": "Souvlaki",
+      "year": "1993",
+      "genre": "Alternative",
+      "duration": "4:46",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1b/50/ad/1b50adc8-139b-1ad9-8500-cc2eb93faf17/888880730831.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/d6/29/8cd62943-9c69-3f1b-79b9-fad0883a0e9a/mzaf_9349941370226318512.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/when-the-sun-hits/292885238?i=292885262&uo=4"
+    },
+    {
+      "id": "214478893",
+      "title": "Love You to Death",
+      "artist": "Type O Negative",
+      "album": "October Rust",
+      "year": "1996",
+      "genre": "Metal",
+      "duration": "7:09",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d0/df/8c/d0df8ce9-c21f-7c31-b1e6-1bc84003495a/mzi.zuajwfip.jpg/1000x1000bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e6/0a/38/e60a385c-6d19-79a9-62d8-c939deaef9d2/mzaf_4643524401871230775.plus.aac.p.m4a",
+      "url": "https://music.apple.com/us/album/love-you-to-death/214478798?i=214478893&uo=4"
+    }
+  ]
+}

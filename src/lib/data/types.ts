@@ -16,7 +16,29 @@ export type IconName =
   | 'qr'
   | 'arrow'
   | 'play'
-  | 'pin';
+  | 'pause'
+  | 'pin'
+  | 'music'
+  | 'code'
+  | 'moon'
+  | 'coffee'
+  | 'camera'
+  | 'game'
+  | 'film'
+  | 'star'
+  | 'plus'
+  | 'upload'
+  | 'download'
+  | 'close'
+  | 'chevron-left'
+  | 'chevron-right'
+  | 'clock'
+  | 'image'
+  | 'sparkle'
+  | 'tiktok'
+  | 'bluesky'
+  | 'youtube'
+  | 'twitch';
 
 export interface Link {
   id: string;
@@ -42,23 +64,57 @@ export interface Identity {
   avatar: Image;
 }
 
-export interface Track {
+export interface Record {
   id: string;
   title: string;
   artist: string;
+  album: string;
+  year: string;
+  genre: string;
   duration: string;
+  /** Apple artwork, 1000×1000. */
+  artwork: string;
+  /** 30-second Apple preview. */
+  preview: string;
+  /** Apple Music link for the track. */
+  url: string;
 }
 
-export interface Interest {
-  label: string;
-  value: string;
+export interface Crate {
+  title: string;
+  curator: string;
+  /** The whole playlist on Apple Music, when set. */
+  appleMusicUrl: string;
+  tracks: Record[];
 }
+
+export type StatusGlyph = 'code' | 'music' | 'moon' | 'coffee' | 'camera' | 'game';
+
+export interface Status {
+  glyph: StatusGlyph;
+  text: string;
+  /** ISO date-time; shown as "2h ago". */
+  since: string;
+}
+
+export interface InterestGroup {
+  id: string;
+  label: string;
+  icon: IconName;
+  blurb: string;
+  items: string[];
+}
+
+export type SocialPlatform = 'instagram' | 'x' | 'github' | 'tiktok' | 'bluesky' | 'youtube' | 'twitch';
 
 export interface Friend {
   id: string;
   name: string;
-  src: string;
   caption: string;
+  /** Pulls their real profile picture. Without it the friend gets a colour tile. */
+  social?: { platform: SocialPlatform; handle: string };
+  /** Colour tile used when there is no social avatar (or it fails to load). */
+  tile: string;
 }
 
 export interface GuestbookEntry {
@@ -69,20 +125,26 @@ export interface GuestbookEntry {
   replies?: GuestbookEntry[];
 }
 
+/** Giscus: GitHub Discussions behind the guestbook. Empty ids = not set up yet. */
+export interface GiscusConfig {
+  repo: string;
+  repoId: string;
+  category: string;
+  categoryId: string;
+}
+
 export interface CasualProfile {
   tagline: string;
-  status: string;
+  statuses: Status[];
   lastSeen: string;
   memberSince: string;
+  timezone: string;
   about: string;
   links: Link[];
-  roll: Image[];
-  /** Full-bleed mood board, dithered like everything else. */
-  wall: Image;
-  playlist: { title: string; artist: string; art: Image; tracks: Track[] };
-  interests: Interest[];
+  interests: InterestGroup[];
   friends: Friend[];
   guestbook: GuestbookEntry[];
+  giscus: GiscusConfig;
 }
 
 export type WorkStatus = 'live' | 'building' | 'running';

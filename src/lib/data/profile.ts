@@ -6,9 +6,9 @@ import type { CasualProfile, Identity, ProProfile } from './types';
  */
 
 export const identity: Identity = {
-  name: 'Das',
-  handle: 'das',
-  brand: 'dasdev.net',
+  name: 'Arriq',
+  handle: 'arriq',
+  brand: 'DasDev.net',
   host: 'p.dasdev.net',
   email: 'hello@dasdev.net',
   location: 'Florida · remote',
@@ -20,71 +20,79 @@ export const identity: Identity = {
 
 export const casual: CasualProfile = {
   tagline: 'websites that don’t come out of a template drawer',
-  status: 'compiling a feeling',
+  // Newest first. The card shows the first and lets visitors flip back through.
+  statuses: [
+    { glyph: 'code', text: 'Shipping the tap card', since: '2026-09-23T15:00:00-04:00' },
+    { glyph: 'music', text: 'White Pony on repeat', since: '2026-09-23T09:30:00-04:00' },
+    { glyph: 'moon', text: 'Homelab after dark', since: '2026-09-22T23:10:00-04:00' },
+  ],
   lastSeen: 'right now, probably',
   memberSince: 'Jan 20, 2007',
+  timezone: 'America/New_York',
   about:
     'I build for small businesses and for myself — NIL, a Minecraft box that stays up, RouteSim, this page. Florida humidity on the windows, analog cameras in a drawer, old web in the bookmarks. A room with the lights down and a flyer on the wall.',
   links: [
     { id: 'ig', label: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
     { id: 'x', label: 'X', href: 'https://x.com/', icon: 'x' },
     { id: 'dc', label: 'Discord', href: 'https://discord.com/', icon: 'discord' },
-    { id: 'sp', label: 'Spotify', href: 'https://open.spotify.com/', icon: 'spotify' },
+    { id: 'am', label: 'Apple Music', href: 'https://music.apple.com/', icon: 'music' },
     { id: 'gh', label: 'GitHub', href: 'https://github.com/DasVR', icon: 'github', detail: 'DasVR' },
-    { id: 'www', label: 'dasdev.net', href: 'https://dasdev.net', icon: 'globe' },
+    { id: 'www', label: 'DasDev.net', href: 'https://dasdev.net', icon: 'globe' },
   ],
-  roll: [
-    { src: '/photos/gig-lights.jpg', alt: 'Crowd silhouettes under orange stage lights' },
-    { src: '/photos/torn-flyer.jpg', alt: 'A torn gig flyer taped to a brick wall' },
-    { src: '/photos/night-road.jpg', alt: 'A Florida night road under one streetlight' },
-    { src: '/photos/cassette.jpg', alt: 'A cassette resting on a wooden desk' },
-    { src: '/photos/desk-glow.jpg', alt: 'A dim workstation with a glowing monitor' },
-    { src: '/photos/window-rain.jpg', alt: 'Rain on a night window' },
-  ],
-  wall: {
-    src: '/photos/mood-board.jpg',
-    alt: 'Gothic MySpace mood board: black-and-white collage, barcodes, wings, a dense friend grid',
-  },
-  playlist: {
-    title: 'Gig Flyer Vol. 2',
-    artist: 'das · mix',
-    art: { src: '/album/gig-flyer-vol2.jpg', alt: 'Gig Flyer Vol. 2 cover' },
-    tracks: [
-      { id: 't1', title: 'Change (In the House of Flies)', artist: 'Deftones', duration: '4:59' },
-      { id: 't2', title: 'Heart-Shaped Box', artist: 'Nirvana', duration: '4:41' },
-      { id: 't3', title: 'Be Quiet and Drive (Far Away)', artist: 'Deftones', duration: '5:08' },
-      { id: 't4', title: 'Bloodhail', artist: 'Have a Nice Life', duration: '6:13' },
-      { id: 't5', title: 'When the Sun Hits', artist: 'Slowdive', duration: '4:47' },
-      { id: 't6', title: 'Love You to Death', artist: 'Type O Negative', duration: '7:08' },
-    ],
-  },
   interests: [
     {
-      label: 'General',
-      value: 'homelab nights, analog cameras, Florida storms, websites that feel inhabited',
-    },
-    {
+      id: 'music',
       label: 'Music',
-      value: 'Deftones, Nirvana, Have a Nice Life, Slowdive, Type O Negative, the mix CD in the glovebox',
+      icon: 'music',
+      blurb: 'Whatever was on the mix CD in the glovebox. Loud, then very quiet.',
+      items: ['Deftones', 'Nirvana', 'Have a Nice Life', 'Slowdive', 'Type O Negative', 'shoegaze', 'late-night drives'],
     },
     {
+      id: 'making',
+      label: 'Making',
+      icon: 'code',
+      blurb: 'Websites that feel inhabited, and the machines that keep them up.',
+      items: ['SvelteKit', 'WebGL shaders', 'NIL', 'RouteSim', 'homelab', 'self-hosting', 'small-business sites'],
+    },
+    {
+      id: 'analog',
+      label: 'Analog',
+      icon: 'camera',
+      blurb: 'Film cameras in a drawer and a soft spot for anything with a dial.',
+      items: ['35mm film', 'disposables', 'cassettes', 'CRTs', 'flyers on telephone poles'],
+    },
+    {
+      id: 'watching',
       label: 'Watching',
-      value: 'Donnie Darko, Serial Experiments Lain, old Adult Swim bumpers, concert docs on cheap cameras',
+      icon: 'film',
+      blurb: 'Stuff that felt like it came through the TV at 2am.',
+      items: ['Donnie Darko', 'Serial Experiments Lain', 'Adult Swim bumpers', 'concert docs on cheap cameras'],
     },
     {
+      id: 'playing',
+      label: 'Playing',
+      icon: 'game',
+      blurb: 'The server is always up. Building in the dark with the rain on.',
+      items: ['Minecraft', 'modded servers', 'co-op anything', 'old handhelds'],
+    },
+    {
+      id: 'heroes',
       label: 'Heroes',
-      value: 'whoever left a 2004 guestbook entry that still loads, the inventor of the 88×31 blinkie',
+      icon: 'star',
+      blurb: 'The people who made the old web weird on purpose.',
+      items: ['whoever left a 2004 guestbook entry that still loads', 'the inventor of the 88×31 blinkie', 'Florida storms'],
     },
   ],
+  // Add `social: { platform, handle }` to pull a friend's real profile picture.
   friends: [
-    { id: 'f1', name: 'arriq', src: '/friends/f1.jpg', caption: 'top 8 forever' },
-    { id: 'f2', name: 'mossbox', src: '/friends/f2.jpg', caption: 'brings the aux' },
-    { id: 'f3', name: 'lain.local', src: '/friends/f3.jpg', caption: 'wired' },
-    { id: 'f4', name: 'polebarn', src: '/friends/f4.jpg', caption: 'flyer thief' },
-    { id: 'f5', name: 'humidkid', src: '/friends/f5.jpg', caption: 'florida' },
-    { id: 'f6', name: 'scanline', src: '/friends/f6.jpg', caption: 'crt loyalist' },
-    { id: 'f7', name: 'slowdrive', src: '/friends/f7.jpg', caption: 'reverb' },
-    { id: 'f8', name: 'nil-finn', src: '/friends/f8.jpg', caption: 'on-device' },
+    { id: 'f1', name: 'mossbox', caption: 'brings the aux', tile: '/friends/f2.jpg' },
+    { id: 'f2', name: 'lain.local', caption: 'wired', tile: '/friends/f3.jpg' },
+    { id: 'f3', name: 'polebarn', caption: 'flyer thief', tile: '/friends/f4.jpg' },
+    { id: 'f4', name: 'humidkid', caption: 'florida', tile: '/friends/f5.jpg' },
+    { id: 'f5', name: 'scanline', caption: 'crt loyalist', tile: '/friends/f6.jpg' },
+    { id: 'f6', name: 'slowdrive', caption: 'reverb', tile: '/friends/f7.jpg' },
+    { id: 'f7', name: 'nil-finn', caption: 'on-device', tile: '/friends/f8.jpg' },
+    { id: 'f8', name: 'DasVR', caption: 'the studio', tile: '/friends/f1.jpg', social: { platform: 'github', handle: 'DasVR' } },
   ],
   guestbook: [
     {
@@ -92,7 +100,7 @@ export const casual: CasualProfile = {
       author: 'mossbox',
       date: 'Sep 12, 2026',
       body: 'tapped my phone on your keychain and it did the thing. do not clean it up.',
-      replies: [{ id: 'g1a', author: 'das', date: 'Sep 12, 2026', body: 'that is the assignment. dither stays.' }],
+      replies: [{ id: 'g1a', author: 'arriq', date: 'Sep 12, 2026', body: 'that is the assignment. dither stays.' }],
     },
     {
       id: 'g2',
@@ -107,10 +115,17 @@ export const casual: CasualProfile = {
       body: 'saw a Deftones poster on 19 that looked exactly like your album tile. coincidence is a kind of design.',
       replies: [
         { id: 'g3a', author: 'humidkid', date: 'Sep 8, 2026', body: 'it is never a coincidence down here.' },
-        { id: 'g3b', author: 'das', date: 'Sep 9, 2026', body: 'bring me the poster.' },
+        { id: 'g3b', author: 'arriq', date: 'Sep 9, 2026', body: 'bring me the poster.' },
       ],
     },
   ],
+  // Fill these in from giscus.app once Discussions + the giscus app are on the repo.
+  giscus: {
+    repo: 'DasVR/spacehey-personal',
+    repoId: '',
+    category: 'Guestbook',
+    categoryId: '',
+  },
 };
 
 export const pro: ProProfile = {

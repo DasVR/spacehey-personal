@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { app } from '$lib/app.svelte.ts';
+  import { app, REACTIONS } from '$lib/app.svelte.ts';
   import type { GuestbookEntry } from '$lib/data/types';
 
   let author = $state('');
@@ -7,10 +7,20 @@
 
   function submit(event: SubmitEvent): void {
     event.preventDefault();
-    if (!body.trim()) return;
-    app.sign(author, body);
+    const error = app.sign(author, body);
+    if (error) {
+      app.say(error);
+      return;
+    }
     body = '';
     app.say('Signed. It lives in this browser.');
+  }
+
+  /** A stable starting count per entry so the book doesn't look empty. */
+  function seed(id: string, r: string): number {
+    let h = 0;
+    for (const ch of id + r) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h % 5;
   }
 </script>
 
@@ -18,6 +28,17 @@
   <li class="entry" style="--depth: {depth}">
     <p class="who"><strong>{item.author}</strong><span>{item.date}</span></p>
     <p class="said">{item.body}</p>
+    {#if depth === 0}
+      <div class="reacts" role="group" aria-label="Reactions">
+        {#each REACTIONS as r (r)}
+          {@const mine = app.reacted[item.id]?.includes(r) ?? false}
+          {@const n = seed(item.id, r) + (mine ? 1 : 0)}
+          <button type="button" class="react press" class:mine aria-pressed={mine} onclick={() => app.react(item.id, r)}>
+            <span>{r}</span>{#if n > 0}<span class="n">{n}</span>{/if}
+          </button>
+        {/each}
+      </div>
+    {/if}
     {#if item.replies?.length}
       <ul>
         {#each item.replies as reply (reply.id)}
@@ -31,7 +52,7 @@
 <form class="sign" onsubmit={submit}>
   <input name="name" placeholder="name" autocomplete="nickname" maxlength="32" bind:value={author} aria-label="Your name" />
   <textarea name="comment" rows="2" placeholder="leave something" maxlength="400" bind:value={body} aria-label="Comment"></textarea>
-  <button type="submit" class="press" disabled={!body.trim()}>Sign</button>
+  <button type="submit" class="press" disabled={body.trim().length < 2}>Sign</button>
 </form>
 
 <ul class="book">
@@ -133,6 +154,39 @@
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     color: var(--color-ink-faint);
+  }
+
+  .reacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: var(--s-2);
+  }
+
+  .react {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    padding-inline: 10px;
+    border-radius: var(--r-pill);
+    font-size: var(--t-small);
+    background: var(--color-raised);
+    box-shadow: 0 0 0 1px var(--color-line);
+    transition-property: background-color, box-shadow, scale;
+    transition-duration: 150ms;
+  }
+
+  .react .n {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .react.mine {
+    background: color-mix(in oklch, var(--color-accent) 18%, var(--color-raised));
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 60%, transparent);
   }
 
   .said {

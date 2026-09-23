@@ -99,3 +99,25 @@ the serial number and the red). Motion values follow the `better-ui` skill:
   Top 8 are colourful initial tiles.
 - A bento/mood-board panel layout was tried and reverted; the casual page
   keeps its original Section-based layout.
+
+## Update: crate, roll, interests, Top 8, guestbook (Arriq)
+
+- Owner is **Arriq** of **DasDev.net**; the card, vCards and island say so.
+- The "mood" line is now a status pill: icon, text, "2h ago", tap to flip
+  back through recent statuses.
+- The card adds live local time (with the offset from the visitor) and a
+  QR sheet for face-to-face sharing.
+- Now playing is **the crate**: real sleeves from Apple (via
+  `npm run music`) that lean away as you swipe, cover-flow style; the
+  vinyl slides out and spins while the 30s Apple preview plays, and it
+  keeps playing as you flip.
+- **Roll** reads `src/lib/roll/` at build time. Tap a photo for a lightbox
+  with Dither/Photo, grain size and 1-bit/3-tone. Dithered images now
+  "develop" from the finger/cursor with an animated mask. `/roll/add/` is
+  the owner's upload tool.
+- The mood-board image is gone: it was design reference, not content.
+- **Interests** are a tab strip with a sliding pill, synced to a swipeable
+  card carousel.
+- **Top 8** pulls real avatars from socials through unavatar.io.
+- **Guestbook** is giscus (GitHub Discussions) once configured; the local
+  fallback gets reactions, input cleaning and a 30s rate limit.
