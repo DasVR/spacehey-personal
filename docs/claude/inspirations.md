@@ -97,16 +97,12 @@ Social marks shipped: IG, X, DC, SP, GH, WWW.
 - A separate `StarField.svelte` (stars are a div in `+layout.svelte`)
 - The original rust tokens as the casual skin (they remain only as history)
 
-## Generated stand-in assets (in the Svelte repo, not the zip)
+## Generated stand-in assets
 
-- `static/photos/avatar.jpg`, `gig-lights.jpg`, `torn-flyer.jpg`,
-  `night-road.jpg`, `cassette.jpg`, `desk-glow.jpg`, `window-rain.jpg`
-- `static/album/gig-flyer-vol2.jpg`
-- `static/friends/f1.jpg`–`f8.jpg`
-- `static/favicon.svg`
-
-These are not real digicam shots. The prompt asked for real ones before
-the photo section was styled. They were never supplied.
+Same files as `static/`, copied into [assets/profile/](assets/profile/)
+so this folder has the bytes. They are not real digicam shots. The prompt
+asked for real ones before the photo section was styled. They were never
+supplied. The gallery is [assets/README.md](assets/README.md).
 
 ## Copy voice (pointers, not a second theme)
 
