@@ -1,43 +1,45 @@
-export interface NavLink {
-  href: string;
-  label: string;
-}
+export type Mode = 'casual' | 'pro';
 
-export interface Tag {
-  label: string;
-}
+export type IconName =
+  | 'github'
+  | 'globe'
+  | 'mail'
+  | 'instagram'
+  | 'x'
+  | 'discord'
+  | 'spotify'
+  | 'share'
+  | 'contact'
+  | 'copy'
+  | 'check'
+  | 'nfc'
+  | 'qr'
+  | 'arrow'
+  | 'play'
+  | 'pin';
 
-export type ContactId = 'friend' | 'message' | 'im' | 'forward';
-
-export interface ContactAction {
-  id: ContactId;
-  label: string;
-}
-
-export interface InterestRow {
-  label: string;
-  value: string;
-}
-
-export type WidgetKind = 'game' | 'status' | 'building' | 'custom';
-
-export interface Widget {
+export interface Link {
   id: string;
-  kind: WidgetKind;
-  title: string;
-  body: string;
-  span?: 1 | 2;
+  label: string;
+  href: string;
+  icon: IconName;
+  /** Shown under the label on the card, e.g. a handle. */
+  detail?: string;
 }
 
-export interface Photo {
+export interface Image {
   src: string;
   alt: string;
-  rotate: number;
-  left: string;
-  top: string;
-  width: string;
-  z: number;
-  bleed?: boolean;
+}
+
+export interface Identity {
+  name: string;
+  handle: string;
+  brand: string;
+  host: string;
+  email: string;
+  location: string;
+  avatar: Image;
 }
 
 export interface Track {
@@ -45,13 +47,11 @@ export interface Track {
   title: string;
   artist: string;
   duration: string;
-  playing?: boolean;
 }
 
-export interface Blinkie {
-  id: string;
+export interface Interest {
   label: string;
-  href?: string;
+  value: string;
 }
 
 export interface Friend {
@@ -69,30 +69,52 @@ export interface GuestbookEntry {
   replies?: GuestbookEntry[];
 }
 
-export interface Profile {
-  brand: string;
-  displayName: string;
-  username: string;
-  location: string;
+export interface CasualProfile {
+  tagline: string;
+  status: string;
+  lastSeen: string;
   memberSince: string;
-  mood: string;
-  lastLogin: string;
-  avatar: { src: string; alt: string };
-  tags: Tag[];
-  nav: NavLink[];
-  contacts: ContactAction[];
   about: string;
-  meet: string;
-  interests: InterestRow[];
-  widgets: Widget[];
-  photos: Photo[];
-  playlist: {
-    title: string;
-    artist: string;
-    art: string;
-    tracks: Track[];
-  };
-  blinkies: Blinkie[];
+  links: Link[];
+  roll: Image[];
+  playlist: { title: string; artist: string; art: Image; tracks: Track[] };
+  interests: Interest[];
   friends: Friend[];
   guestbook: GuestbookEntry[];
+}
+
+export type WorkStatus = 'live' | 'building' | 'running';
+
+export interface Work {
+  id: string;
+  name: string;
+  summary: string;
+  status: WorkStatus;
+  meta: string;
+  href?: string;
+}
+
+export interface ProProfile {
+  role: string;
+  availability: string;
+  summary: string;
+  links: Link[];
+  work: Work[];
+  capabilities: string[];
+  stack: string[];
+}
+
+/** What goes into the downloadable vCard for a mode. */
+export interface ContactCard {
+  mode: Mode;
+  name: string;
+  nickname: string;
+  title?: string;
+  org?: string;
+  email: string;
+  url: string;
+  note: string;
+  location: string;
+  socials: { type: string; url: string }[];
+  photo?: { mime: string; base64: string };
 }

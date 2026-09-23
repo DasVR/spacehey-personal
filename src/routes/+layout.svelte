@@ -1,48 +1,60 @@
 <script lang="ts">
   import '$lib/styles/tokens.css';
-  import '$lib/styles/motion.css';
   import '$lib/styles/app.css';
-  import { browser } from '$app/environment';
-  import ProfileNav from '$lib/components/ProfileNav.svelte';
-  import { profile } from '$lib/data/profile';
-  import { profileState } from '$lib/profile.svelte.ts';
-  import { theme } from '$lib/theme.svelte.ts';
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
+  import { onNavigate } from '$app/navigation';
+  import { base } from '$app/paths';
+  import { page } from '$app/state';
+  import DitherField from '$lib/components/DitherField.svelte';
+  import Toast from '$lib/components/Toast.svelte';
+  import TopBar from '$lib/components/TopBar.svelte';
+  import { app } from '$lib/app.svelte.ts';
+  import { identity } from '$lib/data/profile';
+  import { THEME_COLOR, applyMode, modeFromPath } from '$lib/theme';
 
   let { children }: { children: Snippet } = $props();
 
-  $effect(() => {
-    if (!browser) return;
-    theme.hydrate();
-    profileState.hydrate();
+  const mode = $derived(modeFromPath(page.url.pathname, base));
+
+  onMount(() => app.hydrate());
+
+  $effect(() => applyMode(mode));
+
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return;
+    const from = navigation.from ? modeFromPath(navigation.from.url.pathname, base) : mode;
+    const to = navigation.to ? modeFromPath(navigation.to.url.pathname, base) : mode;
+    if (from === to) return;
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+    });
   });
 </script>
 
 <svelte:head>
-  <title>{profile.displayName} · {profile.brand}</title>
+  <meta name="theme-color" content={THEME_COLOR[mode]} />
 </svelte:head>
 
-<div class="page-shell">
-  <div class="page-well">
-    <ProfileNav brand={profile.brand} links={profile.nav} />
-    {@render children()}
-  </div>
-  {#if profileState.toast}
-    <p class="toast" role="status" aria-live="polite">{profileState.toast}</p>
-  {/if}
+<DitherField />
+
+<div class="shell">
+  <TopBar {mode} host={identity.host} />
+  {@render children()}
 </div>
 
+<Toast />
+
 <style>
-  .toast {
-    position: fixed;
-    right: var(--s-4);
-    bottom: var(--s-4);
-    z-index: var(--z-nav);
-    max-width: 22rem;
-    background: var(--color-panel);
-    color: var(--color-ink);
-    border: 1px solid var(--color-accent-bright);
-    padding: var(--s-3);
-    box-shadow: 2px 3px 6px var(--color-shadow);
+  .shell {
+    position: relative;
+    z-index: var(--z-page);
+    width: 100%;
+    max-width: calc(var(--page-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
+    padding-top: env(safe-area-inset-top);
   }
 </style>

@@ -1,13 +1,6 @@
 <script lang="ts">
-  import GrainLayer from './GrainLayer.svelte';
-  import { profileState } from '$lib/profile.svelte.ts';
+  import { app } from '$lib/app.svelte.ts';
   import type { GuestbookEntry } from '$lib/data/types';
-
-  interface Props {
-    entries: GuestbookEntry[];
-  }
-
-  let { entries }: Props = $props();
 
   let author = $state('');
   let body = $state('');
@@ -15,117 +8,138 @@
   function submit(event: SubmitEvent): void {
     event.preventDefault();
     if (!body.trim()) return;
-    profileState.signGuestbook(author, body);
-    author = '';
+    app.sign(author, body);
     body = '';
+    app.say('Signed. It lives in this browser.');
   }
 </script>
 
-<section class="book">
-  <GrainLayer />
-  <h2 class="section-title">Guestbook</h2>
-  <form onsubmit={submit}>
-    <label>
-      <span class="eyebrow">name</span>
-      <input bind:value={author} placeholder="anon" maxlength="32" />
-    </label>
-    <label>
-      <span class="eyebrow">comment</span>
-      <textarea bind:value={body} rows="3" required placeholder="make it look like 2007."></textarea>
-    </label>
-    <button type="submit">sign guestbook</button>
-  </form>
-  <ol class="thread">
-    {#each entries as entry (entry.id)}
-      <li>
-        {@render entryBlock(entry, 0)}
-      </li>
-    {/each}
-  </ol>
-</section>
-
-{#snippet entryBlock(entry: GuestbookEntry, depth: number)}
-  <article class="entry" style:margin-left="{depth * 1.25}rem">
-    <header>
-      <strong>{entry.author}</strong>
-      <time>{entry.date}</time>
-    </header>
-    <p>{entry.body}</p>
-    {#if entry.replies?.length}
-      <ol class="thread nested">
-        {#each entry.replies as reply (reply.id)}
-          <li>
-            {@render entryBlock(reply, depth + 1)}
-          </li>
+{#snippet entry(item: GuestbookEntry, depth: number)}
+  <li class="entry" style="--depth: {depth}">
+    <p class="who"><strong>{item.author}</strong><span>{item.date}</span></p>
+    <p class="said">{item.body}</p>
+    {#if item.replies?.length}
+      <ul>
+        {#each item.replies as reply (reply.id)}
+          {@render entry(reply, depth + 1)}
         {/each}
-      </ol>
+      </ul>
     {/if}
-  </article>
+  </li>
 {/snippet}
 
+<form class="sign" onsubmit={submit}>
+  <input name="name" placeholder="name" autocomplete="nickname" maxlength="32" bind:value={author} aria-label="Your name" />
+  <textarea name="comment" rows="2" placeholder="leave something" maxlength="400" bind:value={body} aria-label="Comment"></textarea>
+  <button type="submit" class="press" disabled={!body.trim()}>Sign</button>
+</form>
+
+<ul class="book">
+  {#each app.guestbook as item (item.id)}
+    {@render entry(item, 0)}
+  {/each}
+</ul>
+
 <style>
-  .book {
-    position: relative;
-    overflow: hidden;
-    background: var(--color-panel);
-    border: 1px solid var(--color-line);
-    padding: var(--s-4);
-  }
-
-  form {
+  .sign {
     display: grid;
+    grid-template-columns: 1fr auto;
     gap: var(--s-2);
-    margin-bottom: var(--s-5);
-  }
-
-  label {
-    display: grid;
-    gap: var(--s-1);
+    padding: var(--s-2);
+    border-radius: 16px;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
   }
 
   input,
   textarea {
-    background: var(--color-bg);
-    border: 1px solid var(--color-line);
-    padding: var(--s-2);
+    grid-column: 1 / -1;
+    width: 100%;
+    padding: 10px var(--s-3);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 16px;
+    resize: none;
+  }
+
+  input {
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 8px 8px 0 0;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ink-faint);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    background: var(--color-hover);
   }
 
   button {
-    justify-self: start;
+    grid-column: 2;
+    height: 40px;
+    padding-inline: var(--s-4);
+    border-radius: 8px;
+    font-size: var(--t-small);
+    font-weight: 600;
+    color: var(--color-on-accent);
     background: var(--color-accent);
-    color: var(--color-ink);
-    border: 1px solid var(--color-void);
-    padding: 0.4rem 0.8rem;
+    transition-property: opacity, scale;
+    transition-duration: 150ms;
   }
 
-  .thread {
+  button:disabled {
+    opacity: 0.4;
+  }
+
+  .book,
+  .book :global(ul) {
     list-style: none;
-    padding: 0;
-    margin: 0;
     display: grid;
-    gap: var(--s-3);
   }
 
-  .nested {
-    margin-top: var(--s-3);
-    border-left: 2px solid var(--color-accent);
+  .entry {
+    padding-block: var(--s-3);
+  }
+
+  .book > .entry + .entry {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .entry .entry {
+    margin-left: var(--s-3);
     padding-left: var(--s-3);
+    padding-bottom: 0;
+    box-shadow: -1px 0 0 0 color-mix(in oklch, var(--color-accent) 60%, transparent);
   }
 
-  .entry header {
+  .who {
     display: flex;
-    justify-content: space-between;
-    gap: var(--s-3);
-    font-size: var(--t-meta);
-    margin-bottom: var(--s-1);
+    align-items: baseline;
+    gap: var(--s-2);
+    font-size: var(--t-small);
+    color: var(--color-ink);
   }
 
-  time {
-    color: var(--color-ink-dim);
+  .who strong {
+    font-weight: 600;
+  }
+
+  .who span {
     font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
   }
 
-  .entry p {
-    color: var(--color-ink-soft);
+  .said {
+    margin-top: 2px;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    color: var(--color-ink-dim);
+    text-wrap: pretty;
   }
 </style>

@@ -1,41 +1,23 @@
-/* Locked palette from the profile brief. Hex lives only in this file. */
+/*
+ * Design tokens. Hex lives only in this file.
+ * Two modes keyed off <html data-theme>: `casual` (night) and `pro` (paper).
+ * The shader and the dithered images read --dither-* / --shader-* at runtime,
+ * so their palettes stay here too.
+ */
 
 :root {
-  --font-display: 'Anton', Impact, sans-serif;
-  --font-body: 'Trebuchet MS', 'Trebuchet', sans-serif;
-  --font-mono: 'Courier New', Courier, monospace;
-
-  --color-bg: #0d0b09;
-  --color-panel: #161310;
-  --color-ink: #d9d0c2;
-  --color-ink-dim: #8f8577;
-  --color-accent: #7a4a32;
-  --color-accent-bright: #b06a42;
-
-  --color-void: #000000;
-  --color-glitch-r: #ff2d55;
-  --color-glitch-c: #2de0ff;
-  --color-paper: #cfc3b0;
-  --color-halo: color-mix(in srgb, var(--color-ink) 55%, transparent);
-  --color-line: color-mix(in srgb, var(--color-ink) 16%, var(--color-bg));
-  --color-line-hot: color-mix(in srgb, var(--color-accent-bright) 45%, var(--color-bg));
-  --color-raised: color-mix(in srgb, var(--color-panel) 82%, var(--color-ink));
-  --color-ink-soft: color-mix(in srgb, var(--color-ink) 72%, var(--color-bg));
-  --color-shadow: color-mix(in srgb, var(--color-void) 55%, transparent);
-  --color-panel-glass: color-mix(in srgb, var(--color-panel) 88%, transparent);
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-poster: 'Anton', Impact, sans-serif;
 
   --t-micro: 0.6875rem;
   --t-meta: 0.75rem;
-  --t-body: 0.875rem;
-  --t-lead: 1.05rem;
-  --t-head: 1.35rem;
-  --t-display: clamp(2.8rem, 8vw, 5.4rem);
-
-  --track-display: 0.02em;
-  --track-tick: 0.12em;
-
-  --lh-tight: 0.92;
-  --lh-body: 1.55;
+  --t-small: 0.8125rem;
+  --t-body: 0.9375rem;
+  --t-lead: 1.0625rem;
+  --t-title: 1.375rem;
+  --t-poster: clamp(3.5rem, 18vw, 5.5rem);
 
   --s-1: 0.25rem;
   --s-2: 0.5rem;
@@ -44,43 +26,107 @@
   --s-5: 1.5rem;
   --s-6: 2rem;
   --s-7: 3rem;
+  --s-8: 4.5rem;
 
-  --page-max: 64rem;
-  --left-col: 17.5rem;
+  --r-card: 28px;
+  --r-card-pad: 12px;
+  /* Concentric: inner radius = outer radius - padding. */
+  --r-inner: calc(var(--r-card) - var(--r-card-pad));
+  --r-control: 12px;
+  --r-pill: 999px;
 
-  --z-base: 1;
-  --z-bleed: 2;
-  --z-nav: 20;
-  --z-grain: 30;
+  --card-w: 25rem;
+  --col-w: 42rem;
+  --page-max: 72rem;
+  --gutter: 16px;
 
-  --grain-opacity: 0.3;
-  --photo-contrast: 1.3;
-  --photo-gray: 0.4;
-  --photo-sepia: 0.08;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-drop: cubic-bezier(0.16, 1.24, 0.3, 1);
+
+  --z-field: 0;
+  --z-page: 1;
+  --z-dock: 20;
+  --z-island: 30;
+  --z-toast: 40;
+
+  /* Casual — night. Black, cream, the red from the old flyer. */
+  --color-bg: #070707;
+  --color-surface: #0e0e0e;
+  --color-raised: #161616;
+  --color-ink: #ece7dd;
+  --color-ink-dim: #8c877d;
+  --color-ink-faint: #57534c;
+  --color-accent: #e01b2e;
+  --color-on-accent: #fff6f2;
+  --color-live: #3ddc84;
+  --color-line: color-mix(in oklch, var(--color-ink) 10%, transparent);
+  --color-line-strong: color-mix(in oklch, var(--color-ink) 18%, transparent);
+  --color-hover: color-mix(in oklch, var(--color-ink) 6%, transparent);
+
+  --shadow-card:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 9%, transparent),
+    0 1px 0 0 color-mix(in oklch, var(--color-ink) 8%, transparent) inset,
+    0 24px 48px -12px oklch(0 0 0 / 0.7),
+    0 60px 120px -40px color-mix(in oklch, var(--color-accent) 30%, transparent);
+  --shadow-float:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 10%, transparent),
+    0 12px 32px -8px oklch(0 0 0 / 0.6);
+  --img-outline: oklch(1 0 0 / 0.1);
+
+  --dither-dark: #0b0b0b;
+  --dither-mid: #6e1019;
+  --dither-light: #ece7dd;
+
+  --shader-0: #070707;
+  --shader-1: #1d0508;
+  --shader-2: #9e1322;
+  --shader-3: #ece7dd;
+  --shader-speed: 1;
+  --shader-gain: 0.78;
+  --shader-cell: 3;
+
+  --name-font: var(--font-poster);
+  --name-case: uppercase;
+  --name-track: 0.01em;
 }
 
 [data-theme='pro'] {
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --color-bg: #f3efe6;
-  --color-panel: #fffcf7;
-  --color-ink: #1c1914;
-  --color-ink-dim: #6b645a;
-  --color-accent: #3d342c;
-  --color-accent-bright: #1c1914;
-  --color-void: #1c1914;
-  --color-glitch-r: transparent;
-  --color-glitch-c: transparent;
-  --color-paper: #fffcf7;
-  --color-halo: color-mix(in srgb, var(--color-ink) 40%, transparent);
-  --color-line: color-mix(in srgb, var(--color-ink) 14%, var(--color-bg));
-  --color-line-hot: var(--color-ink);
-  --color-raised: #fffcf7;
-  --color-ink-soft: color-mix(in srgb, var(--color-ink) 80%, var(--color-bg));
-  --color-shadow: color-mix(in srgb, var(--color-void) 10%, transparent);
-  --color-panel-glass: var(--color-panel);
-  --grain-opacity: 0;
-  --photo-contrast: 1;
-  --photo-gray: 0.08;
-  --photo-sepia: 0;
+  /* Pro — paper. Warm off-white, graphite ink, one clay accent. */
+  --color-bg: #f3f0e8;
+  --color-surface: #fbfaf6;
+  --color-raised: #ffffff;
+  --color-ink: #1b1a17;
+  --color-ink-dim: #6b665c;
+  --color-ink-faint: #a39d91;
+  --color-accent: #c4552f;
+  --color-on-accent: #fffaf5;
+  --color-live: #2f9e5b;
+  --color-line: color-mix(in oklch, var(--color-ink) 9%, transparent);
+  --color-line-strong: color-mix(in oklch, var(--color-ink) 16%, transparent);
+  --color-hover: color-mix(in oklch, var(--color-ink) 4%, transparent);
+
+  --shadow-card:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 8%, transparent),
+    0 1px 2px -1px oklch(0 0 0 / 0.08),
+    0 24px 48px -16px oklch(0 0 0 / 0.14);
+  --shadow-float:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 8%, transparent),
+    0 10px 28px -10px oklch(0 0 0 / 0.2);
+  --img-outline: oklch(0 0 0 / 0.1);
+
+  --dither-dark: #1b1a17;
+  --dither-mid: #8b8579;
+  --dither-light: #fbfaf6;
+
+  --shader-0: #f3f0e8;
+  --shader-1: #e6e1d5;
+  --shader-2: #cfc7b7;
+  --shader-3: #c4552f;
+  --shader-speed: 0.6;
+  --shader-gain: 0.8;
+  --shader-cell: 2;
+
+  --name-font: var(--font-serif);
+  --name-case: none;
+  --name-track: -0.01em;
 }
