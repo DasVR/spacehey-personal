@@ -1051,7 +1051,7 @@
 
   .arriving .card {
     transform-origin: 50% 0;
-    animation: card-drop 900ms var(--ease-out) 700ms backwards;
+    animation: card-drop 800ms cubic-bezier(0.34, 1.25, 0.5, 1) 900ms backwards;
   }
 
   .arriving [style*='--i'] {
@@ -1113,14 +1113,13 @@
     }
   }
 
+  /* The card surfaces under the island once it has splatted: a soft spring, no shrunken sliver. */
   @keyframes card-drop {
     0% {
       opacity: 0;
-      transform: translateY(var(--drop-y, -40vh)) scale(0.22);
-      filter: blur(12px);
-      border-radius: 60px;
+      transform: translateY(-28px) scale(0.94);
     }
-    35% {
+    40% {
       opacity: 1;
     }
   }
