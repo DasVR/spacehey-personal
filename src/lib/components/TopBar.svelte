@@ -40,6 +40,7 @@
 
 <style>
   .bar {
+    view-transition-name: topbar;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -19,6 +19,10 @@
       <Icon name="nfc" size={16} />
       Replay tap
     </button>
+    <a class="pill press" href={pageHref('/links')}>
+      <Icon name="globe" size={16} />
+      All links
+    </a>
     <a class="pill press" href={pageHref('/tags')}>
       <Icon name="qr" size={16} />
       Tags & QR

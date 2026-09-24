@@ -18,6 +18,48 @@
 
   let dialog: HTMLDialogElement;
 
+  /*
+   * Native-feeling sheet: drag it down to dismiss (rubber-bands if you pull
+   * up), and it slides away instead of vanishing when closed any other way.
+   */
+  let dragY = $state(0);
+  let dragging = $state(false);
+  let leaving = $state(false);
+  let start = { y: 0, t: 0 };
+
+  function dismiss(): void {
+    if (leaving) return;
+    leaving = true;
+    navigator.vibrate?.(4);
+    window.setTimeout(() => {
+      onclose();
+      leaving = false;
+      dragY = 0;
+    }, 260);
+  }
+
+  function grab(event: PointerEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.grab-zone') || target.closest('button, a')) return;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    dragging = true;
+    start = { y: event.clientY, t: performance.now() };
+  }
+
+  function pull(event: PointerEvent): void {
+    if (!dragging) return;
+    const dy = event.clientY - start.y;
+    dragY = dy > 0 ? dy : dy * 0.18;
+  }
+
+  function release(event: PointerEvent): void {
+    if (!dragging) return;
+    dragging = false;
+    const velocity = (event.clientY - start.y) / Math.max(1, performance.now() - start.t);
+    if (dragY > 120 || velocity > 0.7) dismiss();
+    else dragY = 0;
+  }
+
   /** Both cards, then every profile link — everything worth handing someone. */
   const rows = $derived.by(() => {
     const origin = url ? new URL(url).origin : '';
@@ -26,6 +68,7 @@
     return [
       { id: 'card', label: 'Card', icon: 'contact' as const, href: casual },
       { id: 'pro', label: 'Pro card', icon: 'code' as const, href: pro },
+      { id: 'links', label: 'Link page', icon: 'globe' as const, href: origin ? new URL(pageHref('/links'), origin).href : url },
       ...links.filter((l) => !l.href.startsWith('mailto:')).map((l) => ({ id: l.id, label: l.label, icon: l.icon, href: l.href })),
     ];
   });
@@ -53,18 +96,35 @@
     document.documentElement.classList.remove('locked');
     onclose();
   }}
+  oncancel={(e) => {
+    e.preventDefault();
+    dismiss();
+  }}
   onclick={(e) => {
-    if (e.target === dialog) onclose();
+    if (e.target === dialog) dismiss();
   }}
 >
-  <div class="panel">
+  <!-- Drag handling is a gesture on top of the Close button and Esc. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="panel"
+    class:dragging
+    class:leaving
+    style="translate: 0 {dragY}px"
+    onpointerdown={grab}
+    onpointermove={pull}
+    onpointerup={release}
+    onpointercancel={release}
+  >
+    <div class="grab-zone">
     <span class="grabber" aria-hidden="true"></span>
     <header>
       <h2 id="share-title">Share {name}</h2>
-      <button type="button" class="close press" onclick={onclose} aria-label="Close">
+      <button type="button" class="close press" onclick={dismiss} aria-label="Close">
         <Icon name="close" size={18} />
       </button>
     </header>
+    </div>
 
     <div class="quick">
       <button type="button" class="big press" onclick={onshare}>
@@ -127,6 +187,21 @@
     background: var(--color-surface);
     box-shadow: var(--shadow-card);
     animation: rise 520ms cubic-bezier(0.34, 1.3, 0.5, 1);
+    transition: translate 480ms cubic-bezier(0.34, 1.3, 0.5, 1);
+  }
+
+  .panel.dragging {
+    transition: none;
+  }
+
+  .panel.leaving {
+    translate: 0 110% !important;
+    transition: translate 260ms cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  .sheet:has(.leaving)::backdrop {
+    opacity: 0;
+    transition: opacity 260ms;
   }
 
   @media (min-width: 560px) {
@@ -139,6 +214,15 @@
     .panel {
       border-radius: 28px;
     }
+  }
+
+  .grab-zone {
+    display: grid;
+    gap: var(--s-4);
+    margin: -10px calc(-1 * var(--s-5)) 0;
+    padding: 10px var(--s-5) 0;
+    touch-action: none;
+    cursor: grab;
   }
 
   .grabber {
