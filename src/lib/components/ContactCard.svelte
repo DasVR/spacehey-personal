@@ -157,6 +157,31 @@
     }
   }
 
+  /* Press and hold a link to copy it instead of opening it. */
+  let holdTimer = 0;
+  let held = false;
+  function holdStart(event: PointerEvent, href: string, label: string): void {
+    held = false;
+    const el = event.currentTarget as HTMLElement;
+    window.clearTimeout(holdTimer);
+    holdTimer = window.setTimeout(async () => {
+      held = true;
+      el.classList.add('copied');
+      window.setTimeout(() => el.classList.remove('copied'), 900);
+      navigator.vibrate?.([6, 40, 12]);
+      try {
+        await navigator.clipboard.writeText(href.replace(/^mailto:/, ''));
+        app.say(`${label} copied`);
+      } catch {
+        app.say(href);
+      }
+    }, 480);
+  }
+
+  function holdEnd(): void {
+    window.clearTimeout(holdTimer);
+  }
+
   function tilt(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') return;
     const rect = card.getBoundingClientRect();
@@ -286,18 +311,51 @@
         <CopyButton value={shareUrl} label="Copy link" done="Link copied" />
       </div>
 
-      <ul class="links" class:grid={mode === 'casual'} style="--i: 4">
-        {#each links as link (link.id)}
-          <li>
-            <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener me">
-              <Icon name={link.icon} size={18} />
-              <span class="link-label">{link.label}</span>
-              {#if link.detail && mode === 'pro'}<span class="link-detail">{link.detail}</span>{/if}
-              {#if mode === 'pro'}<span class="link-arrow"><Icon name="arrow" size={14} /></span>{/if}
-            </a>
-          </li>
-        {/each}
-      </ul>
+      {#if mode === 'casual'}
+        <!-- Link-tree stack: the featured link is the big button; hold any row to copy it. -->
+        <ul class="tree" style="--i: 4">
+          {#each links as link, n (link.id)}
+            <li style="--n: {n}">
+              <a
+                class="tree-row press"
+                class:featured={link.featured}
+                href={link.href}
+                target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel="noopener me"
+                onpointerdown={(e) => holdStart(e, link.href, link.label)}
+                onpointerup={holdEnd}
+                onpointerleave={holdEnd}
+                onpointercancel={holdEnd}
+                onclick={(e) => {
+                  if (held) {
+                    e.preventDefault();
+                    held = false;
+                  }
+                }}
+                oncontextmenu={(e) => e.preventDefault()}
+              >
+                <span class="tree-ico"><Icon name={link.icon} size={17} /></span>
+                <span class="tree-label">{link.label}</span>
+                {#if link.detail}<span class="tree-detail">{link.detail}</span>{/if}
+                <span class="tree-arrow"><Icon name="arrow" size={14} /></span>
+              </a>
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <ul class="links" style="--i: 4">
+          {#each links as link (link.id)}
+            <li>
+              <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener me">
+                <Icon name={link.icon} size={18} />
+                <span class="link-label">{link.label}</span>
+                {#if link.detail}<span class="link-detail">{link.detail}</span>{/if}
+                <span class="link-arrow"><Icon name="arrow" size={14} /></span>
+              </a>
+            </li>
+          {/each}
+        </ul>
+      {/if}
     </div>
   </article>
 </div>
@@ -314,10 +372,6 @@
   name={identity.name}
   {links}
   onshare={share}
-  onqr={() => {
-    shareOpen = false;
-    qrOpen = true;
-  }}
   onclose={() => (shareOpen = false)}
 />
 
@@ -828,28 +882,130 @@
     translate: 1px -1px;
   }
 
-  .links.grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-  }
+  /* ---------- casual: link tree ---------- */
 
-  .links.grid a {
-    flex-direction: column;
-    justify-content: center;
+  .tree {
+    display: grid;
     gap: 6px;
-    min-height: 64px;
-    font-size: var(--t-micro);
-    font-family: var(--font-mono);
-    letter-spacing: 0.02em;
-    color: var(--color-ink-dim);
+    list-style: none;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--color-line);
   }
 
-  .links.grid a:hover {
+  .tree li {
+    animation: tree-in 520ms cubic-bezier(0.34, 1.35, 0.5, 1) both;
+    animation-delay: calc(250ms + var(--n) * 40ms);
+  }
+
+  .tree-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 48px;
+    padding: 6px 14px 6px 6px;
+    overflow: hidden;
+    border-radius: 16px;
     color: var(--color-ink);
+    text-decoration: none;
+    background: var(--color-raised);
+    box-shadow: 0 0 0 1px var(--color-line);
+    -webkit-touch-callout: none;
+    user-select: none;
+    transition-property: scale, background-color, translate, box-shadow;
   }
 
-  .links.grid li:nth-child(4) a {
-    color: var(--color-accent);
+  /* Hold feedback: a fill sweeps across while you press, and flashes when copied. */
+  .tree-row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--color-accent) 22%, transparent);
+    transform-origin: left;
+    scale: 0 1;
+    transition: scale 150ms ease-out;
+    pointer-events: none;
+  }
+
+  .tree-row:active::before {
+    scale: 1 1;
+    transition: scale 480ms linear;
+  }
+
+  .tree-row:global(.copied) {
+    box-shadow: 0 0 0 2px var(--color-accent);
+  }
+
+  @media (hover: hover) {
+    .tree-row:hover {
+      background: var(--color-hover);
+      translate: 0 -1px;
+    }
+
+    .tree-row:hover .tree-arrow {
+      translate: 2px -2px;
+      color: var(--color-accent);
+    }
+  }
+
+  .tree-ico {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: var(--color-surface);
+  }
+
+  .tree-label {
+    position: relative;
+    font-size: var(--t-body);
+    font-weight: 600;
+  }
+
+  .tree-detail {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
+  }
+
+  .tree-arrow {
+    position: relative;
+    display: inline-flex;
+    margin-left: auto;
+    color: var(--color-ink-faint);
+    transition: translate 300ms cubic-bezier(0.34, 1.56, 0.64, 1), color 200ms;
+  }
+
+  .tree-row.featured {
+    min-height: 56px;
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+    box-shadow: 0 10px 30px -12px color-mix(in oklch, var(--color-accent) 70%, transparent);
+  }
+
+  .tree-row.featured .tree-ico {
+    background: oklch(1 0 0 / 0.16);
+  }
+
+  .tree-row.featured .tree-detail,
+  .tree-row.featured .tree-arrow {
+    color: inherit;
+    opacity: 0.8;
+  }
+
+  @keyframes tree-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.96);
+    }
   }
 
   /* ---------- arrival: the island ---------- */

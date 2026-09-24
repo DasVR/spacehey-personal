@@ -47,6 +47,8 @@ export interface Link {
   icon: IconName;
   /** Shown under the label on the card, e.g. a handle. */
   detail?: string;
+  /** Pinned to the top as the big accent button. */
+  featured?: boolean;
 }
 
 export interface Image {

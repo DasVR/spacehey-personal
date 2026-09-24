@@ -1,3 +1,5 @@
+import linkData from './links.json';
+import { parseLinks } from '$lib/links';
 import type { CasualProfile, Identity, ProProfile } from './types';
 
 /*
@@ -31,14 +33,7 @@ export const casual: CasualProfile = {
   timezone: 'America/New_York',
   about:
     'I build for small businesses and for myself — NIL, a Minecraft box that stays up, RouteSim, this page. Florida humidity on the windows, analog cameras in a drawer, old web in the bookmarks. A room with the lights down and a flyer on the wall.',
-  links: [
-    { id: 'ig', label: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
-    { id: 'x', label: 'X', href: 'https://x.com/', icon: 'x' },
-    { id: 'dc', label: 'Discord', href: 'https://discord.com/', icon: 'discord' },
-    { id: 'am', label: 'Apple Music', href: 'https://music.apple.com/', icon: 'music' },
-    { id: 'gh', label: 'GitHub', href: 'https://github.com/DasVR', icon: 'github', detail: 'DasVR' },
-    { id: 'www', label: 'DasDev.net', href: 'https://dasdev.net', icon: 'globe' },
-  ],
+  links: parseLinks(linkData.casual),
   interests: [
     {
       id: 'music',
@@ -134,11 +129,7 @@ export const pro: ProProfile = {
   availability: 'Open to small-business sites',
   summary:
     'I design and build websites for small businesses that don’t look like they came out of a template drawer — fast, hand-styled, and easy to keep running. On the side I build tools I want to exist.',
-  links: [
-    { id: 'mail', label: 'Email', href: 'mailto:hello@dasdev.net', icon: 'mail', detail: 'hello@dasdev.net' },
-    { id: 'www', label: 'Portfolio', href: 'https://dasdev.net', icon: 'globe', detail: 'dasdev.net' },
-    { id: 'gh', label: 'GitHub', href: 'https://github.com/DasVR', icon: 'github', detail: 'DasVR' },
-  ],
+  links: parseLinks(linkData.pro),
   work: [
     {
       id: 'dasdev',

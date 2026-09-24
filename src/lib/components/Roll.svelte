@@ -53,7 +53,7 @@
     <div class="add-slot" role="listitem">
       <a class="add press" href={pageHref('/roll/add')}>
         <Icon name="upload" size={22} />
-        <span>Add to the roll</span>
+        <span>Manage the roll</span>
       </a>
     </div>
   {/if}

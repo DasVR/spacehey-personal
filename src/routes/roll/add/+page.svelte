@@ -4,12 +4,21 @@
   import Icon from '$lib/components/Icon.svelte';
   import { app } from '$lib/app.svelte.ts';
   import { identity } from '$lib/data/profile';
+  import { roll, type RollPhoto } from '$lib/roll';
   import { PALETTES, rollFileName, type PaletteName, type RollLook } from '$lib/roll-name';
   import { formatBytes, prepPhoto, type Upscale } from '$lib/utils/photo';
   import { pageHref } from '$lib/utils/urls';
 
   /** Where the roll lives in the repo; GitHub's uploader drops files straight in. */
   const UPLOAD_URL = 'https://github.com/DasVR/spacehey-personal/upload/main/src/lib/roll';
+  const DELETE_URL = (file: string) => `https://github.com/DasVR/spacehey-personal/delete/main/src/lib/roll/${file}`;
+
+  /** Working on a photo already in the roll: swap the image, or just restyle it. */
+  let target = $state<{ photo: RollPhoto; mode: 'replace' | 'restyle' } | null>(null);
+  let picker: HTMLInputElement;
+  let pickFor: RollPhoto | null = null;
+  const stem = (file: string) => file.replace(/\.[^.]+$/, '');
+  const extOf = (file: string) => file.split('.').pop()?.toLowerCase() ?? '';
 
   interface Source {
     file: File;
@@ -71,7 +80,9 @@
   let out = $state<{ url: string; blob: Blob; width: number; height: number } | null>(null);
 
   const ext = $derived(format === 'image/webp' ? 'webp' : 'jpg');
-  const name = $derived(rollFileName(date, caption || 'untitled', ext));
+  /** Replacing keeps the old file name so it takes the same spot and overwrites on upload. */
+  const name = $derived(target ? `${stem(target.photo.file)}.${ext}` : rollFileName(date, caption || 'untitled', ext));
+  const sameName = $derived(!target || `${stem(target.photo.file)}.${ext}` === target.photo.file);
   const lookName = $derived(name.replace(/\.[^.]+$/, '.json'));
 
   onMount(() => {
@@ -82,6 +93,44 @@
       /* private mode */
     }
   });
+
+  function loadLook(photo: RollPhoto): void {
+    const l = photo.look;
+    note = l.note ?? '';
+    dither = l.dither !== false;
+    grain = l.grain ?? 3;
+    tones = l.tones ?? 3;
+    if (Array.isArray(l.palette)) {
+      customPal = [...l.palette];
+      paletteName = 'custom';
+    } else paletteName = l.palette ?? 'theme';
+    focus = l.focus ?? [50, 50];
+  }
+
+  /** Start from a photo that's already in the roll. */
+  async function begin(photo: RollPhoto, mode: 'replace' | 'restyle', file?: File): Promise<void> {
+    let f = file;
+    if (!f) {
+      const blob = await (await fetch(photo.src)).blob();
+      f = new File([blob], photo.file, { type: blob.type || 'image/jpeg' });
+    }
+    await take(f);
+    target = { photo, mode };
+    caption = photo.caption;
+    date = photo.date || date;
+    loadLook(photo);
+    // Match the existing extension when we can, so the upload overwrites it.
+    const e = extOf(photo.file);
+    if (e === 'webp') format = 'image/webp';
+    else if (e === 'jpg' || e === 'jpeg') format = 'image/jpeg';
+    upscale = 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function replace(photo: RollPhoto): void {
+    pickFor = photo;
+    picker.click();
+  }
 
   async function take(file: File | undefined): Promise<void> {
     if (!file || !file.type.startsWith('image/')) {
@@ -157,11 +206,60 @@
 <main class="add">
   <header>
     <a class="back" href={pageHref('/')}><Icon name="chevron-left" size={16} /> Back to the card</a>
-    <h1>Add to the roll</h1>
-    <p class="lead">Drop a photo, tune it, and it lands on the page after one upload. Location data is stripped on the way.</p>
+    <h1>{target ? (target.mode === 'replace' ? `Replace “${target.photo.caption}”` : `Restyle “${target.photo.caption}”`) : 'Your roll'}</h1>
+    <p class="lead">
+      {#if target?.mode === 'replace'}
+        The new photo keeps this one's name, so uploading it swaps it in place.
+      {:else if target}
+        Tune how it shows on the page, then save the look file.
+      {:else}
+        Swap photos out, restyle them, or add new ones. Location data is stripped on the way.
+      {/if}
+    </p>
   </header>
 
+  <input
+    bind:this={picker}
+    class="hidden-input"
+    type="file"
+    accept="image/*"
+    onchange={(e) => {
+      const f = e.currentTarget.files?.[0];
+      if (f && pickFor) begin(pickFor, 'replace', f);
+      e.currentTarget.value = '';
+    }}
+  />
+
   {#if !source}
+    {#if roll.length}
+      <ul class="current">
+        {#each roll as photo, i (photo.file)}
+          <li style="--i: {i}">
+            <div class="thumb-sm">
+              <DitherImage
+                src={photo.src}
+                alt={photo.caption}
+                cell={photo.look.grain ?? 3}
+                levels={photo.look.tones ?? 3}
+                palette={photo.look.palette ?? 'theme'}
+                focus={photo.look.focus}
+                developed={photo.look.dither === false ? true : undefined}
+              />
+            </div>
+            <div class="cur-txt">
+              <strong>{photo.caption}</strong>
+              <span>{photo.file}</span>
+            </div>
+            <div class="cur-actions">
+              <button type="button" class="chip press" onclick={() => replace(photo)}><Icon name="upload" size={14} /> Replace</button>
+              <button type="button" class="chip press" onclick={() => begin(photo, 'restyle')}><Icon name="sparkle" size={14} /> Restyle</button>
+              <a class="chip danger press" href={DELETE_URL(photo.file)} target="_blank" rel="noopener"><Icon name="close" size={14} /> Remove</a>
+            </div>
+          </li>
+        {/each}
+      </ul>
+      <h2 class="sub">Add a new photo</h2>
+    {/if}
     <label
       class="drop"
       class:dragging
@@ -356,7 +454,17 @@
           </li>
         </ol>
 
-        <button type="button" class="reset" onclick={() => (source = null)}>Start over with another photo</button>
+        {#if target && !sameName}
+          <p class="note warn">This saves as <b>{name}</b>. After uploading, remove the old <b>{target.photo.file}</b> so it doesn't show twice.</p>
+        {/if}
+        <button
+          type="button"
+          class="reset"
+          onclick={() => {
+            source = null;
+            target = null;
+          }}>Back to your roll</button
+        >
       </form>
     </div>
   {/if}
@@ -714,5 +822,95 @@
     padding: 0;
     border: 0;
     background: none;
+  }
+
+  .hidden-input {
+    display: none;
+  }
+
+  .current {
+    list-style: none;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .current li {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 4px var(--s-3);
+    align-items: center;
+    padding: 8px;
+    border-radius: 18px;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+    animation: cur-in 480ms cubic-bezier(0.34, 1.3, 0.5, 1) both;
+    animation-delay: calc(var(--i) * 40ms);
+  }
+
+  .thumb-sm {
+    grid-row: span 2;
+    width: 64px;
+    aspect-ratio: 4 / 5;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .cur-txt {
+    display: grid;
+    min-width: 0;
+  }
+
+  .cur-txt strong {
+    font-weight: 600;
+  }
+
+  .cur-txt span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
+  }
+
+  .cur-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 32px;
+    padding-inline: 10px;
+    border-radius: 999px;
+    font-size: var(--t-meta);
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: none;
+    background: var(--color-raised);
+  }
+
+  .chip.danger {
+    color: var(--color-accent);
+  }
+
+  .sub {
+    margin-top: var(--s-3);
+    font-size: var(--t-title);
+    font-weight: 600;
+  }
+
+  .warn {
+    color: var(--color-accent);
+  }
+
+  @keyframes cur-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
   }
 </style>

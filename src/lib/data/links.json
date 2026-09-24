@@ -1,0 +1,15 @@
+{
+  "casual": [
+    { "id": "ig", "label": "Instagram", "href": "https://instagram.com/", "featured": true },
+    { "id": "x", "label": "X", "href": "https://x.com/" },
+    { "id": "dc", "label": "Discord", "href": "https://discord.com/" },
+    { "id": "am", "label": "Apple Music", "href": "https://music.apple.com/" },
+    { "id": "gh", "label": "GitHub", "href": "https://github.com/DasVR", "detail": "DasVR" },
+    { "id": "www", "label": "DasDev.net", "href": "https://dasdev.net" }
+  ],
+  "pro": [
+    { "id": "mail", "label": "Email", "href": "mailto:hello@dasdev.net", "detail": "hello@dasdev.net", "featured": true },
+    { "id": "www", "label": "Portfolio", "href": "https://dasdev.net", "detail": "dasdev.net" },
+    { "id": "gh", "label": "GitHub", "href": "https://github.com/DasVR", "detail": "DasVR" }
+  ]
+}

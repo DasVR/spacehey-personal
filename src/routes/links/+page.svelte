@@ -23,6 +23,7 @@
     href: string;
     icon: IconName;
     external: boolean;
+    featured?: boolean;
   }
 
   const host = (href: string) => href.replace(/^https?:\/\//, '').replace(/^mailto:/, '').replace(/\/$/, '');
@@ -37,12 +38,15 @@
       href: l.href,
       icon: l.icon,
       external: true,
+      featured: l.featured,
     })),
     { id: 'pro', label: 'Work with me', detail: 'the pro card', href: pageHref('/pro'), icon: 'code', external: false },
     { id: 'mail', label: 'Email', detail: identity.email, href: `mailto:${identity.email}`, icon: 'mail', external: false },
   ];
 
   let shareOpen = $state(false);
+  /** Owner's devices (they've visited an editor) get an Edit link. */
+  let owner = $state(false);
   let qrOpen = $state(false);
   let url = $state('');
   let now = $state(Date.now());
@@ -50,6 +54,11 @@
 
   onMount(() => {
     url = new URL(pageHref('/links'), window.location.origin).href;
+    try {
+      owner = localStorage.getItem('roll-owner') === '1';
+    } catch {
+      /* private mode */
+    }
     const tick = window.setInterval(() => (now = Date.now()), 30_000);
     return () => window.clearInterval(tick);
   });
@@ -120,6 +129,7 @@
       <li style="--i: {i}">
         <a
           class="row press"
+          class:featured={row.featured}
           href={row.href}
           target={row.external ? '_blank' : undefined}
           rel={row.external ? 'noopener me' : undefined}
@@ -151,7 +161,9 @@
     </a>
   {/if}
 
-  <p class="fine">{identity.brand} · <a href={pageHref('/tags')}>tap card</a></p>
+  <p class="fine">
+    {identity.brand} · <a href={pageHref('/tags')}>tap card</a>{#if owner} · <a href={pageHref('/links/edit')}>edit links</a>{/if}
+  </p>
 </main>
 
 <ShareSheet
@@ -160,10 +172,6 @@
   name={identity.name}
   links={casual.links}
   onshare={share}
-  onqr={() => {
-    shareOpen = false;
-    qrOpen = true;
-  }}
   onclose={() => (shareOpen = false)}
 />
 <QrSheet open={qrOpen} url={url ? `${url}?via=qr` : ''} name={identity.name} onclose={() => (qrOpen = false)} />
@@ -352,6 +360,23 @@
     border-radius: 14px;
     color: var(--color-ink);
     background: var(--color-raised);
+  }
+
+  .row.featured {
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+    box-shadow: 0 12px 30px -14px color-mix(in oklch, var(--color-accent) 80%, transparent);
+  }
+
+  .row.featured .ico {
+    color: inherit;
+    background: oklch(1 0 0 / 0.16);
+  }
+
+  .row.featured .txt > span,
+  .row.featured .arrow {
+    color: inherit;
+    opacity: 0.8;
   }
 
   li:first-child .ico {
