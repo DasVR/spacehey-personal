@@ -181,12 +181,13 @@
     <!-- Metaball filter: blurred black shapes re-thresholded so they melt into each other. -->
     <svg class="isl-defs" width="0" height="0" aria-hidden="true">
       <filter id="isl-goo" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -12" />
       </filter>
     </svg>
     <div class="goo" aria-hidden="true">
       <span class="lip"></span>
+      <span class="neck"></span>
       <span class="blob"></span>
     </div>
     <div class="face">
@@ -860,11 +861,13 @@
    */
   .isl {
     --anchor: clamp(-30px, calc(env(safe-area-inset-top, 0px) - 48px), 11px);
+    /* Where the expanded island settles: clear of the status bar, which iOS blurs. */
+    --at: max(calc(var(--anchor) + 50px), calc(env(safe-area-inset-top, 0px) + 58px));
     --w: min(372px, calc(100vw - 20px));
     position: fixed;
     inset: 0 0 auto;
     z-index: var(--z-island);
-    height: 160px;
+    height: 260px;
     pointer-events: none;
   }
 
@@ -879,6 +882,7 @@
   }
 
   .lip,
+  .neck,
   .blob,
   .face {
     position: absolute;
@@ -900,13 +904,22 @@
     animation: drop 2.6s both;
   }
 
+  /* The thread of liquid between the island and the drop; the goo filter melts it into both. */
+  .neck {
+    top: calc(var(--anchor) + 18px);
+    width: 30px;
+    height: 0;
+    border-radius: 15px;
+    animation: neck 2.6s both;
+  }
+
   /*
    * The face never changes size, so nothing inside it reflows mid-animation.
    * It sits where the island opens and is revealed by a clip that grows from
    * a pill to the full shape, in step with the blob underneath.
    */
   .face {
-    top: calc(var(--anchor) + 50px);
+    top: var(--at);
     width: var(--w);
     height: 76px;
     display: flex;
@@ -929,7 +942,7 @@
     opacity: 0;
     will-change: transform, opacity, filter;
     animation:
-      piece-in 520ms cubic-bezier(0.2, 0, 0, 1) calc(700ms + var(--d)) forwards,
+      piece-in 520ms cubic-bezier(0.2, 0, 0, 1) calc(880ms + var(--d)) forwards,
       piece-out 200ms cubic-bezier(0.4, 0, 1, 1) calc(1840ms - var(--d) / 2) forwards;
   }
 
@@ -982,11 +995,11 @@
 
   /* The name trails the kicker by a beat. */
   .island-text > * {
-    animation: line-in 520ms cubic-bezier(0.2, 0, 0, 1) 770ms backwards;
+    animation: line-in 520ms cubic-bezier(0.2, 0, 0, 1) 950ms backwards;
   }
 
   .island-text > strong {
-    animation-delay: 830ms;
+    animation-delay: 1010ms;
   }
 
   .island-kicker {
@@ -1126,43 +1139,60 @@
    * 34–76%  hold
    * 76–100% it folds back into a pill and gets sucked back up
    */
+  /*
+   * Drip → stretch → splat → wobble → hang → pulled back up. Width and height
+   * overshoot and settle like a spring so it reads as liquid, not a box.
+   */
   @keyframes drop {
     0% {
       top: var(--anchor);
       width: 126px;
       height: 37px;
       border-radius: 20px;
-      animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+      animation-timing-function: cubic-bezier(0.55, 0, 0.8, 0.2);
     }
-    18% {
-      top: calc(var(--anchor) + 40px);
-      width: 110px;
-      height: 44px;
-      border-radius: 22px;
-      animation-timing-function: linear(0, 0.4 10%, 0.86 24%, 1.04 38%, 1.01 52%, 1);
+    14% {
+      top: calc(var(--anchor) + 30px);
+      width: 64px;
+      height: 58px;
+      border-radius: 32px;
+      animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
     }
-    34% {
-      top: calc(var(--anchor) + 50px);
-      width: var(--w);
-      height: 76px;
-      border-radius: 38px;
-    }
-    76% {
-      top: calc(var(--anchor) + 50px);
-      width: var(--w);
-      height: 76px;
-      border-radius: 38px;
+    24% {
+      top: calc(var(--at) - 6px);
+      width: 96px;
+      height: 88px;
+      border-radius: 44px;
       animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
     }
-    88% {
-      top: calc(var(--anchor) + 34px);
-      width: 126px;
-      height: 37px;
-      border-radius: 20px;
-      opacity: 1;
-      animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
+    32% {
+      top: var(--at);
+      width: calc(var(--w) + 14px);
+      height: 68px;
+      border-radius: 34px;
+      animation-timing-function: ease-in-out;
     }
-    98% {
+    38% {
+      width: calc(var(--w) - 8px);
+      height: 80px;
+      border-radius: 40px;
+    }
+    44%,
+    74% {
+      top: var(--at);
+      width: var(--w);
+      height: 76px;
+      border-radius: 38px;
+      animation-timing-function: cubic-bezier(0.5, 0, 0.7, 0.3);
+    }
+    84% {
+      top: calc(var(--at) - 14px);
+      width: 90px;
+      height: 70px;
+      border-radius: 35px;
+      animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.4);
+    }
+    94% {
       top: var(--anchor);
       width: 126px;
       height: 37px;
@@ -1171,21 +1201,54 @@
     }
     100% {
       top: var(--anchor);
+      width: 126px;
+      height: 37px;
+      border-radius: 20px;
       opacity: 0;
+    }
+  }
+
+  @keyframes neck {
+    0%,
+    6% {
+      width: 44px;
+      height: 0;
+    }
+    18% {
+      width: 26px;
+      height: calc(var(--at) - var(--anchor) - 10px);
+    }
+    30% {
+      width: 10px;
+      height: calc(var(--at) - var(--anchor) - 10px);
+    }
+    38%,
+    74% {
+      width: 0;
+      height: calc(var(--at) - var(--anchor) - 30px);
+    }
+    82% {
+      width: 22px;
+      height: calc(var(--at) - var(--anchor) - 10px);
+    }
+    94%,
+    100% {
+      width: 44px;
+      height: 0;
     }
   }
 
   @keyframes face-clip {
     0%,
-    20% {
-      clip-path: inset(0 calc((var(--w) - 126px) / 2) 39px round 20px);
+    24% {
+      clip-path: inset(0 calc((var(--w) - 96px) / 2) 0 round 38px);
     }
-    34%,
-    76% {
+    38%,
+    74% {
       clip-path: inset(0 0 0 round 38px);
       animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
     }
-    86%,
+    84%,
     100% {
       clip-path: inset(0 calc((var(--w) - 126px) / 2) 39px round 20px);
     }
