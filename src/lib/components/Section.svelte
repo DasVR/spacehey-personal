@@ -22,6 +22,8 @@
 <style>
   .section {
     display: grid;
+    /* minmax(0, …) so wide scrollers (the crate, the roll) can't stretch the page. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4);
   }
 

@@ -112,6 +112,7 @@
 <style>
   .tags {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-7);
     max-width: 60rem;
     margin-inline: auto;
@@ -147,18 +148,21 @@
 
   .grid {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4);
   }
 
   @media (min-width: 760px) {
     .grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   .tag {
     --pad: var(--r-card-pad);
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
     gap: var(--s-4);
     padding: var(--pad);
     border-radius: var(--r-card);
@@ -177,6 +181,8 @@
 
   .info {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
     gap: var(--s-3);
     padding: var(--s-2) var(--s-2) var(--s-3);
   }
@@ -193,6 +199,7 @@
 
   .url {
     display: flex;
+    min-width: 0;
     align-items: center;
     gap: var(--s-2);
     padding-left: var(--s-3);

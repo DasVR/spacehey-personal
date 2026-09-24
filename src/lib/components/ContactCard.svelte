@@ -5,6 +5,8 @@
   import CopyButton from './CopyButton.svelte';
   import DitherImage from './DitherImage.svelte';
   import Icon from './Icon.svelte';
+  import Logo from './Logo.svelte';
+  import ShareSheet from './ShareSheet.svelte';
   import QrSheet from './QrSheet.svelte';
   import StatusPill from './StatusPill.svelte';
   import { app } from '$lib/app.svelte.ts';
@@ -26,11 +28,32 @@
     statuses?: Status[];
     /** IANA zone for the live local-time row. */
     timezone?: string;
+    /** Casual: shown on the back of the poster when it flips. */
+    about?: string;
+    memberSince?: string;
   }
 
-  let { mode, identity, headline, status, links, facts, statuses, timezone }: Props = $props();
+  let { mode, identity, headline, status, links, facts, statuses, timezone, about, memberSince }: Props = $props();
 
   let qrOpen = $state(false);
+  let shareOpen = $state(false);
+  let flipped = $state(false);
+  /** Each tap drops a ripple where the finger landed. */
+  let ripples = $state<{ id: number; x: number; y: number }[]>([]);
+
+  function flip(event: MouseEvent): void {
+    const el = event.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    // Keyboard clicks report 0,0: ripple from the middle instead.
+    const x = event.clientX ? event.clientX - rect.left : rect.width / 2;
+    const y = event.clientY ? event.clientY - rect.top : rect.height / 2;
+    const id = Date.now();
+    ripples = [...ripples.slice(-2), { id, x, y }];
+    window.setTimeout(() => (ripples = ripples.filter((r) => r.id !== id)), 900);
+    flipped = !flipped;
+    navigator.vibrate?.(8);
+    app.field?.tap();
+  }
   let now = $state(Date.now());
 
   /** "3:12 PM" plus how far that is from the visitor. */
@@ -191,13 +214,33 @@
     <div class="sheen" aria-hidden="true"></div>
 
     {#if mode === 'casual'}
-      <div class="poster" style="--i: 0">
-        <DitherImage src={identity.avatar.src} alt={identity.avatar.alt} cell={3} eager />
-        <div class="poster-top">
-          <span class="chip"><Icon name="nfc" size={14} /> tap card</span>
-          <span class="serial">003 963 6663</span>
+      <div class="poster-wrap" style="--i: 0">
+        <div class="flipper" class:flipped>
+          <div class="poster front" inert={flipped}>
+            <DitherImage src={identity.avatar.src} alt={identity.avatar.alt} cell={3} eager />
+            <div class="poster-top">
+              <span class="chip"><Icon name="nfc" size={14} /> tap card</span>
+              <span class="serial">003 963 6663</span>
+            </div>
+            <h1 id="card-name" class="name">{identity.name}</h1>
+          </div>
+          <div class="poster back" inert={!flipped} aria-hidden={!flipped}>
+            <div class="back-head">
+              <span class="back-mark"><Logo size={26} /></span>
+              <p class="back-kicker">{identity.brand} · about</p>
+            </div>
+            {#if about}<p class="back-about">{about}</p>{/if}
+            <div class="back-foot">
+              {#if memberSince}<span>since {memberSince}</span>{/if}
+              <span>tap to flip back</span>
+            </div>
+          </div>
         </div>
-        <h1 id="card-name" class="name">{identity.name}</h1>
+        <button type="button" class="flip-hit" onclick={flip} aria-pressed={flipped} aria-label={flipped ? 'Flip the card back' : `Flip the card: about ${identity.name}`}>
+          {#each ripples as r (r.id)}
+            <span class="ripple" style="left: {r.x}px; top: {r.y}px"></span>
+          {/each}
+        </button>
       </div>
     {:else}
       <div class="head" style="--i: 0">
@@ -231,9 +274,9 @@
       <div class="actions" style="--i: 3">
         <a class="btn primary press" href={vcard} data-sveltekit-reload onclick={() => app.say('Opening contact card')}>
           <Icon name="contact" size={18} stroke={2} />
-          <span>Save contact</span>
+          <span class="long">Save contact</span><span class="short">Save</span>
         </a>
-        <button type="button" class="btn icon press" onclick={share} aria-label="Share">
+        <button type="button" class="btn icon press" onclick={() => (shareOpen = true)} aria-label="Share">
           <Icon name="share" size={18} stroke={2} />
         </button>
         <button type="button" class="btn icon press" onclick={() => (qrOpen = true)} aria-label="Show QR code">
@@ -263,6 +306,19 @@
   <span>Save {identity.name}</span>
   <Icon name="contact" size={16} stroke={2} />
 </a>
+
+<ShareSheet
+  open={shareOpen}
+  url={shareUrl}
+  name={identity.name}
+  {links}
+  onshare={share}
+  onqr={() => {
+    shareOpen = false;
+    qrOpen = true;
+  }}
+  onclose={() => (shareOpen = false)}
+/>
 
 <QrSheet open={qrOpen} url={shareUrl ? `${shareUrl}?via=qr` : ''} name={identity.name} onclose={() => (qrOpen = false)} />
 
@@ -321,16 +377,152 @@
 
   /* ---------- casual poster ---------- */
 
-  .poster {
+  .poster-wrap {
     position: relative;
     aspect-ratio: 4 / 4.6;
+    perspective: 1400px;
+  }
+
+  /* A springy 3D flip: overshoots a touch and settles, like a real card. */
+  .flipper {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 800ms cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+
+  .flipper.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .poster {
+    position: absolute;
+    inset: 0;
     border-radius: var(--r-inner);
     overflow: hidden;
     outline: 1px solid var(--img-outline);
     outline-offset: -1px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
-  .poster::after {
+  .back {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: clamp(var(--s-4), 5vw, var(--s-5));
+    transform: rotateY(180deg);
+    color: var(--dither-light);
+    background:
+      radial-gradient(120% 80% at 100% 0%, color-mix(in oklch, var(--color-accent) 35%, transparent), transparent 60%),
+      var(--dither-dark);
+  }
+
+  .back-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .back-mark {
+    display: inline-flex;
+    color: var(--color-accent);
+    transform-origin: 50% 50%;
+  }
+
+  .flipped .back-mark {
+    animation: mark-spin 900ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms both;
+  }
+
+  .back-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .back-about {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    font-size: clamp(0.8125rem, 3.9vw, 1.0625rem);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .back-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    opacity: 0.6;
+  }
+
+  .flip-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    border-radius: var(--r-inner);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: scale 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .flip-hit:active {
+    scale: 0.985;
+  }
+
+  .flip-hit:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* Liquid ripple from the tap point. */
+  .ripple {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, color-mix(in oklch, var(--color-accent) 55%, transparent), transparent 70%);
+    animation: ripple 850ms cubic-bezier(0.2, 0, 0, 1) forwards;
+  }
+
+  @keyframes ripple {
+    from {
+      scale: 0.4;
+      opacity: 1;
+    }
+    to {
+      scale: 28;
+      opacity: 0;
+    }
+  }
+
+  @keyframes mark-spin {
+    from {
+      rotate: -140deg;
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flipper {
+      transition-duration: 1ms;
+    }
+
+    .ripple,
+    .flipped .back-mark {
+      animation: none;
+    }
+  }
+
+  .front::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -513,7 +705,7 @@
 
   .actions {
     display: grid;
-    grid-template-columns: 1fr auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
     gap: var(--s-2);
     align-items: center;
   }
@@ -534,6 +726,38 @@
     text-decoration: none;
     transition-property: background-color, scale, box-shadow;
     transition-duration: 150ms;
+  }
+
+  .btn.primary {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .btn.primary .short {
+    display: none;
+  }
+
+  /* Small phones: Copy lives in the share sheet, so the row keeps its breathing room. */
+  @media (max-width: 360px) {
+    .actions {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    .actions > :global(.copy) {
+      display: none;
+    }
+
+    .btn.primary .long {
+      display: none;
+    }
+
+    .btn.primary .short {
+      display: inline;
+    }
+
+    .btn {
+      padding-inline: var(--s-3);
+    }
   }
 
   .btn:hover {
@@ -831,6 +1055,7 @@
   /* ---------- floating dock (card scrolled away, mostly phones) ---------- */
 
   .dock {
+    white-space: nowrap;
     position: fixed;
     left: 50%;
     bottom: max(16px, env(safe-area-inset-bottom));

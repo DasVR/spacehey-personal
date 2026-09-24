@@ -1,6 +1,8 @@
 <script lang="ts">
   import Logo from './Logo.svelte';
   import type { Mode } from '$lib/data/types';
+  import { app } from '$lib/app.svelte.ts';
+  import { page } from '$app/state';
   import { pageHref } from '$lib/utils/urls';
 
   interface Props {
@@ -9,11 +11,23 @@
   }
 
   let { mode, host }: Props = $props();
+
+  let spins = $state(0);
+
+  /** On its own page the mark doesn't navigate: it spins and replays the tap. */
+  function onBrand(event: MouseEvent): void {
+    const home = pageHref(mode === 'pro' ? '/pro' : '/');
+    if (page.url.pathname !== home) return;
+    event.preventDefault();
+    spins += 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    app.replay();
+  }
 </script>
 
 <header class="bar">
-  <a class="brand" href={pageHref(mode === 'pro' ? '/pro' : '/')}>
-    <span class="mark"><Logo size={16} /></span>
+  <a class="brand" href={pageHref(mode === 'pro' ? '/pro' : '/')} onclick={onBrand}>
+    {#key spins}<span class="mark" class:spin={spins > 0}><Logo size={16} /></span>{/key}
     <span>{host}</span>
   </a>
 
@@ -61,7 +75,21 @@
   }
 
   .mark {
+    display: inline-flex;
     color: var(--color-accent);
+  }
+
+  .mark.spin {
+    animation: spin 900ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes spin {
+    40% {
+      scale: 1.5;
+    }
+    to {
+      rotate: 360deg;
+    }
   }
 
   .switch {

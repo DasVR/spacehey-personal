@@ -17,12 +17,15 @@
 <style>
   .split {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-8);
     padding-top: var(--s-2);
   }
 
   .content {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
     gap: var(--s-8);
     width: 100%;
     max-width: var(--col-w);

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite dev --host 0.0.0.0 --port 5173",
     "build": "vite build",
-    "build:pages": "BASE_PATH=/spacehey-personal vite build",
+    "og": "node scripts/og.mjs",
+    "build:pages": "BASE_PATH=/spacehey-personal SITE_ORIGIN=https://dasvr.github.io vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run --config vitest.config.ts",

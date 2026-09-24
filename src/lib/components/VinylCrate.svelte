@@ -214,14 +214,16 @@
 <style>
   .crate {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4);
   }
 
   /* ---------- the crate ---------- */
 
   .rack {
-    --size: min(46vw, 220px);
+    --size: clamp(132px, 42vw, 220px);
     display: flex;
+    min-width: 0;
     align-items: center;
     height: calc(var(--size) + 48px);
     padding-inline: calc(50% - var(--size) / 2);

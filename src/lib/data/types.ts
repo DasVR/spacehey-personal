@@ -156,10 +156,15 @@ export interface Work {
   status: WorkStatus;
   meta: string;
   href?: string;
+  /** Shown when the row is expanded. */
+  details?: string;
+  tags?: string[];
 }
 
 export interface ProProfile {
   role: string;
+  /** Project types for the "start a project" composer. */
+  projectTypes: string[];
   availability: string;
   summary: string;
   links: Link[];

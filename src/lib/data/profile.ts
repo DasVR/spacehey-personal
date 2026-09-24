@@ -130,6 +130,7 @@ export const casual: CasualProfile = {
 
 export const pro: ProProfile = {
   role: 'Web developer & design engineer',
+  projectTypes: ['New website', 'Redesign', 'Landing page', 'Online store', 'Something odd'],
   availability: 'Open to small-business sites',
   summary:
     'I design and build websites for small businesses that don’t look like they came out of a template drawer — fast, hand-styled, and easy to keep running. On the side I build tools I want to exist.',
@@ -145,6 +146,9 @@ export const pro: ProProfile = {
       summary: 'Portfolio and studio front door. Client sites for small businesses.',
       status: 'live',
       meta: 'Studio',
+      details:
+        'Where client work lives. Every site is hand-styled for the business it’s for — no themes, no page builders, and a handoff the owner can actually edit.',
+      tags: ['SvelteKit', 'Design', 'Client work'],
       href: 'https://dasdev.net',
     },
     {
@@ -153,6 +157,9 @@ export const pro: ProProfile = {
       summary: 'A terminal-first workstation. Svelte 5, on-device, opinionated.',
       status: 'building',
       meta: 'Product',
+      details:
+        'A keyboard-first workspace that runs on your own machine. Svelte 5 runes, exhaustive types, and a strong opinion about where your data lives.',
+      tags: ['Svelte 5', 'TypeScript', 'Local-first'],
     },
     {
       id: 'routesim',
@@ -160,6 +167,9 @@ export const pro: ProProfile = {
       summary: 'A simulation side project that keeps earning more weekends.',
       status: 'building',
       meta: 'Side project',
+      details:
+        'Routing and traffic simulation — part game, part excuse to write pathfinding. Grows a little every free weekend.',
+      tags: ['Simulation', 'Algorithms'],
     },
     {
       id: 'homelab',
@@ -167,6 +177,9 @@ export const pro: ProProfile = {
       summary: 'Self-hosted services and a Minecraft box that stays up through Florida storms.',
       status: 'running',
       meta: 'Infra',
+      details:
+        'A rack of small machines running self-hosted services, backups, and a Minecraft server with better uptime than some hosts.',
+      tags: ['Linux', 'Docker', 'Networking'],
     },
     {
       id: 'card',
@@ -174,6 +187,9 @@ export const pro: ProProfile = {
       summary: 'This card. WebGL dithering, NFC tap-to-share, a vCard in one tap.',
       status: 'live',
       meta: 'Identity',
+      details:
+        'The page you’re on: an NFC and QR tap card with a WebGL dither shader, a Dynamic-Island arrival, and a vCard download in one tap.',
+      tags: ['WebGL', 'NFC', 'SvelteKit'],
     },
   ],
   capabilities: ['Marketing sites', 'Design systems', 'Front-end engineering', 'Motion & WebGL', 'Self-hosting'],
