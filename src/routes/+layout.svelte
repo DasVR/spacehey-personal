@@ -20,16 +20,25 @@
 
   $effect(() => applyMode(mode));
 
+  /** Rough left-to-right order of the pages, so transitions know which way to slide. */
+  const ORDER = ['/', '/links', '/pro', '/tags', '/roll'];
+  function rank(pathname: string): number {
+    const path = pathname.slice(base.length).replace(/\/$/, '') || '/';
+    const i = ORDER.findIndex((p) => p !== '/' && path.startsWith(p));
+    return i === -1 ? 0 : i;
+  }
+
   onNavigate((navigation) => {
-    if (!document.startViewTransition) return;
-    const from = navigation.from ? modeFromPath(navigation.from.url.pathname, base) : mode;
-    const to = navigation.to ? modeFromPath(navigation.to.url.pathname, base) : mode;
-    if (from === to) return;
+    if (!document.startViewTransition || !navigation.from || !navigation.to) return;
+    if (navigation.from.url.pathname === navigation.to.url.pathname) return;
+    const dir = rank(navigation.to.url.pathname) >= rank(navigation.from.url.pathname) ? 'forward' : 'back';
+    document.documentElement.dataset.nav = dir;
     return new Promise((resolve) => {
-      document.startViewTransition(async () => {
+      const vt = document.startViewTransition(async () => {
         resolve();
         await navigation.complete;
       });
+      vt.finished.finally(() => delete document.documentElement.dataset.nav);
     });
   });
 </script>

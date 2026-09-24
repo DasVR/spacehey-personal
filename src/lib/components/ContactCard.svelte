@@ -331,6 +331,7 @@
   }
 
   .card {
+    view-transition-name: card;
     --rx: 0deg;
     --ry: 0deg;
     --mx: 50%;
