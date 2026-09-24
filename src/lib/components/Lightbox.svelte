@@ -2,6 +2,7 @@
   import DitherImage from './DitherImage.svelte';
   import Icon from './Icon.svelte';
   import { formatRollDate, type RollPhoto } from '$lib/roll';
+  import { PALETTES } from '$lib/roll-name';
 
   interface Props {
     photos: RollPhoto[];
@@ -16,9 +17,21 @@
   let view = $state<'dither' | 'photo'>('dither');
   let cell = $state(3);
   let tones = $state<2 | 3>(3);
+  let palette = $state<string | [string, string, string]>('theme');
   let startX = 0;
 
   const photo = $derived(index === null ? null : photos[index]);
+  const custom = $derived(Array.isArray(photo?.look.palette) ? photo.look.palette : null);
+
+  // Each photo opens with its own look (from its sidecar); the controls are yours to play with after.
+  $effect(() => {
+    const look = photo?.look;
+    if (!look) return;
+    view = look.dither === false ? 'photo' : 'dither';
+    cell = look.grain ?? 3;
+    tones = look.tones ?? 3;
+    palette = look.palette ?? 'theme';
+  });
 
   $effect(() => {
     if (!dialog) return;
@@ -61,6 +74,7 @@
       <div class="title">
         <strong>{photo.caption}</strong>
         {#if photo.date}<span>{formatRollDate(photo.date)}</span>{/if}
+        {#if photo.look.note}<em>{photo.look.note}</em>{/if}
       </div>
       <button type="button" class="round press" onclick={onclose} aria-label="Close">
         <Icon name="close" size={18} />
@@ -79,7 +93,7 @@
     >
       {#key photo.file}
         <div class="shot">
-          <DitherImage src={photo.src} alt={photo.caption} {cell} levels={tones} fit="contain" develop={false} developed={view === 'photo'} eager />
+          <DitherImage src={photo.src} alt={photo.caption} {cell} levels={tones} {palette} fit="contain" develop={false} developed={view === 'photo'} eager />
         </div>
       {/key}
       <button type="button" class="round side prev press" onclick={() => go(-1)} aria-label="Previous photo">
@@ -107,6 +121,34 @@
       <div class="seg small" role="radiogroup" aria-label="Tones" class:off={view === 'photo'}>
         <button type="button" role="radio" aria-checked={tones === 2} class:on={tones === 2} onclick={() => (tones = 2)} disabled={view === 'photo'}>1-bit</button>
         <button type="button" role="radio" aria-checked={tones === 3} class:on={tones === 3} onclick={() => (tones = 3)} disabled={view === 'photo'}>3-tone</button>
+      </div>
+      <div class="swatches" role="radiogroup" aria-label="Palette" class:off={view === 'photo'}>
+        {#each PALETTES as p (p)}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={palette === p}
+            aria-label={p}
+            class="sw"
+            class:on={palette === p}
+            style="--a: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-dark); --b: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-mid); --c: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-light)"
+            disabled={view === 'photo'}
+            onclick={() => (palette = p)}
+          ></button>
+        {/each}
+        {#if custom}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={palette === custom}
+            aria-label="This photo's own palette"
+            class="sw"
+            class:on={palette === custom}
+            style="--a: {custom[0]}; --b: {custom[1]}; --c: {custom[2]}"
+            disabled={view === 'photo'}
+            onclick={() => (palette = custom)}
+          ></button>
+        {/if}
       </div>
       <span class="count">{(index ?? 0) + 1} / {photos.length}</span>
     </div>
@@ -265,6 +307,33 @@
     font-family: var(--font-mono);
     font-size: var(--t-micro);
     opacity: 0.7;
+  }
+
+  .title em {
+    font-size: var(--t-small);
+    font-style: normal;
+    opacity: 0.75;
+  }
+
+  .swatches {
+    display: flex;
+    gap: 6px;
+  }
+
+  .sw {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: conic-gradient(var(--a) 0 33%, var(--b) 0 66%, var(--c) 0);
+    box-shadow: 0 0 0 1px oklch(1 0 0 / 0.2);
+    transition-property: scale, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .sw.on {
+    scale: 1.15;
+    box-shadow: 0 0 0 2px var(--dither-light);
   }
 
   .off {

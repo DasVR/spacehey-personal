@@ -30,7 +30,15 @@
   {#each photos as photo, i (photo.file)}
     <figure role="listitem">
       <button type="button" class="frame press" onclick={() => (open = i)} aria-label="Open {photo.caption}">
-        <DitherImage src={photo.src} alt={photo.caption} cell={3} />
+        <DitherImage
+          src={photo.src}
+          alt={photo.caption}
+          cell={photo.look.grain ?? 3}
+          levels={photo.look.tones ?? 3}
+          palette={photo.look.palette ?? 'theme'}
+          focus={photo.look.focus}
+          developed={photo.look.dither === false ? true : undefined}
+        />
         <span class="zoom" aria-hidden="true"><Icon name="plus" size={14} stroke={2} /></span>
       </button>
       <figcaption>

@@ -18,6 +18,10 @@
     eager?: boolean;
     /** `contain` letterboxes instead of cropping (lightbox). */
     fit?: 'cover' | 'contain';
+    /** Named palette ('theme' = the page's own) or three hex colours dark → light. */
+    palette?: string | [string, string, string];
+    /** Crop focus for `cover`, in percent. */
+    focus?: [number, number];
   }
 
   let {
@@ -29,6 +33,8 @@
     developed = undefined,
     eager = false,
     fit = 'cover',
+    palette = 'theme',
+    focus = [50, 50],
   }: Props = $props();
 
   let frame: HTMLDivElement;
@@ -41,12 +47,17 @@
   const url = $derived(assetUrl(src));
   const showPhoto = $derived(developed ?? (develop && (pressed || hovering)));
 
-  function palette(): number[][] {
+  function colors(): number[][] {
     const style = getComputedStyle(frame);
-    const pick = (name: string) => (parseHex(style.getPropertyValue(name)) ?? [0, 0, 0]).map((c) => Math.round(c * 255));
-    const dark = pick('--dither-dark');
-    const light = pick('--dither-light');
-    return levels === 2 ? [dark, light] : [dark, pick('--dither-mid'), light];
+    const rgb = (hex: string) => (parseHex(hex) ?? [0, 0, 0]).map((c) => Math.round(c * 255));
+    let hexes: string[];
+    if (Array.isArray(palette)) hexes = palette;
+    else {
+      const prefix = palette === 'theme' ? '--dither' : `--pal-${palette}`;
+      hexes = ['dark', 'mid', 'light'].map((k) => style.getPropertyValue(`${prefix}-${k}`).trim());
+    }
+    const [dark, mid, light] = hexes.map(rgb);
+    return levels === 2 ? [dark, light] : [dark, mid, light];
   }
 
   function render(): void {
@@ -82,7 +93,7 @@
     const sh = h / scale;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, w, h);
+    ctx.drawImage(img, (iw - sw) * (focus[0] / 100), (ih - sh) * (focus[1] / 100), sw, sh, 0, 0, w, h);
 
     const data = ctx.getImageData(0, 0, w, h);
     const px = data.data;
@@ -97,12 +108,12 @@
     }
     // Stretch to the full range so dark photos still read.
     const span = Math.max(0.08, hi - lo);
-    const colors = palette();
+    const pal = colors();
     for (let y = 0; y < h; y += 1) {
       for (let x = 0; x < w; x += 1) {
         const i = y * w + x;
         const v = Math.pow(Math.max(0, (lum[i] - lo) / span), 0.85);
-        const c = colors[ditherLevel(v, x, y, colors.length)];
+        const c = pal[ditherLevel(v, x, y, pal.length)];
         px[i * 4] = c[0];
         px[i * 4 + 1] = c[1];
         px[i * 4 + 2] = c[2];
@@ -126,6 +137,8 @@
     void cell;
     void levels;
     void fit;
+    void palette;
+    void focus;
     ready = false;
     if (img) requestAnimationFrame(render);
   });
@@ -171,7 +184,7 @@
   onpointerup={() => (pressed = false)}
   onpointercancel={() => (pressed = false)}
 >
-  <img bind:this={img} src={url} {alt} loading={eager ? 'eager' : 'lazy'} decoding="async" draggable="false" />
+  <img bind:this={img} style="object-position: {focus[0]}% {focus[1]}%" src={url} {alt} loading={eager ? 'eager' : 'lazy'} decoding="async" draggable="false" />
   <canvas bind:this={canvas} aria-hidden="true"></canvas>
 </div>
 

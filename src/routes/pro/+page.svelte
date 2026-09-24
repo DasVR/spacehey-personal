@@ -1,22 +1,22 @@
 <script lang="ts">
+  import Meta from '$lib/components/Meta.svelte';
   import ChipList from '$lib/components/ChipList.svelte';
   import ContactCard from '$lib/components/ContactCard.svelte';
-  import Icon from '$lib/components/Icon.svelte';
+  import ProjectComposer from '$lib/components/ProjectComposer.svelte';
   import Section from '$lib/components/Section.svelte';
   import SiteFooter from '$lib/components/SiteFooter.svelte';
   import Split from '$lib/components/Split.svelte';
   import WorkList from '$lib/components/WorkList.svelte';
-  import { identity, pro } from '$lib/data/profile';
-  import { assetUrl } from '$lib/utils/urls';
+  import { casual, identity, pro } from '$lib/data/profile';
 </script>
 
-<svelte:head>
-  <title>{identity.name} — {pro.role}</title>
-  <meta name="description" content="{identity.name}, {pro.role}. {pro.availability}." />
-  <meta property="og:title" content="{identity.name} — {pro.role}" />
-  <meta property="og:description" content={pro.summary} />
-  <meta property="og:image" content={assetUrl(identity.avatar.src)} />
-</svelte:head>
+<Meta
+  title="{identity.name} — {pro.role}"
+  description="{pro.availability}. {pro.summary}"
+  path="/pro"
+  image="/og/pro.png"
+  imageAlt="{identity.name}, {pro.role}"
+/>
 
 <Split>
   {#snippet card()}
@@ -26,6 +26,7 @@
       headline={pro.role}
       status={pro.availability}
       links={pro.links}
+      timezone={casual.timezone}
       facts={[
         { label: 'Based', value: identity.location },
         { label: 'Studio', value: identity.brand },
@@ -49,11 +50,8 @@
     <ChipList items={pro.stack} />
   </Section>
 
-  <Section index="04" title="Contact">
-    <a class="mail" href="mailto:{identity.email}">
-      <span>{identity.email}</span>
-      <Icon name="arrow" size={22} />
-    </a>
+  <Section index="04" title="Start a project">
+    <ProjectComposer email={identity.email} types={pro.projectTypes} />
   </Section>
 
   <SiteFooter mode="pro" host={identity.host} />
@@ -67,25 +65,5 @@
     letter-spacing: -0.01em;
     color: var(--color-ink);
     text-wrap: pretty;
-  }
-
-  .mail {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s-3);
-    font-family: var(--font-serif);
-    font-size: clamp(1.75rem, 7vw, 2.5rem);
-    color: var(--color-ink);
-    text-decoration: none;
-    min-height: 44px;
-    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
-    transition-property: background-size, color;
-    transition-duration: 300ms;
-    transition-timing-function: var(--ease-out);
-  }
-
-  .mail:hover {
-    color: var(--color-accent);
-    background-size: 100% 1px;
   }
 </style>

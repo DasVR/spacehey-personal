@@ -4,7 +4,7 @@
   import Icon from '$lib/components/Icon.svelte';
   import { app } from '$lib/app.svelte.ts';
   import { identity } from '$lib/data/profile';
-  import { rollFileName } from '$lib/roll-name';
+  import { PALETTES, rollFileName, type PaletteName, type RollLook } from '$lib/roll-name';
   import { formatBytes, prepPhoto, type Upscale } from '$lib/utils/photo';
   import { pageHref } from '$lib/utils/urls';
 
@@ -31,10 +31,48 @@
   let quality = $state(0.86);
   let view = $state<'dither' | 'photo'>('dither');
 
+  // The look travels with the photo as a small .json sidecar.
+  let note = $state('');
+  let dither = $state(true);
+  let grain = $state(3);
+  let tones = $state<2 | 3>(3);
+  let paletteName = $state<PaletteName | 'custom'>('theme');
+  let customPal = $state<[string, string, string]>(['#0b0b0b', '#6e1019', '#ece7dd']);
+  let focus = $state<[number, number]>([50, 50]);
+  const palette = $derived(paletteName === 'custom' ? customPal : paletteName);
+  const look = $derived.by<RollLook>(() => {
+    const l: RollLook = {};
+    if (note.trim()) l.note = note.trim();
+    if (!dither) l.dither = false;
+    if (grain !== 3) l.grain = grain;
+    if (tones !== 3) l.tones = tones;
+    if (paletteName !== 'theme') l.palette = palette;
+    if (focus[0] !== 50 || focus[1] !== 50) l.focus = [Math.round(focus[0]), Math.round(focus[1])];
+    return l;
+  });
+  const hasLook = $derived(Object.keys(look).length > 0);
+
+  function saveLook(): void {
+    const blob = new Blob([JSON.stringify(look, null, 2) + '\n'], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = lookName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    app.say('Look saved — upload it next to the photo');
+  }
+
+  /** Tap the preview to set where the square crop centres. */
+  function aimFocus(event: MouseEvent): void {
+    const r = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    focus = [((event.clientX - r.left) / r.width) * 100, ((event.clientY - r.top) / r.height) * 100];
+  }
+
   let out = $state<{ url: string; blob: Blob; width: number; height: number } | null>(null);
 
   const ext = $derived(format === 'image/webp' ? 'webp' : 'jpg');
   const name = $derived(rollFileName(date, caption || 'untitled', ext));
+  const lookName = $derived(name.replace(/\.[^.]+$/, '.json'));
 
   onMount(() => {
     // Visiting this page marks the device as the owner's, so the roll shows an "add" tile.
@@ -149,10 +187,39 @@
         <div class="shot" class:busy>
           {#if out}
             {#key out.url}
-              <DitherImage src={out.url} alt={caption || 'Preview'} fit="contain" develop={false} developed={view === 'photo'} eager />
+              <DitherImage
+                src={out.url}
+                alt={caption || 'Preview'}
+                fit="contain"
+                cell={grain}
+                levels={tones}
+                {palette}
+                develop={false}
+                developed={view === 'photo' || !dither}
+                eager
+              />
             {/key}
           {/if}
         </div>
+        {#if out}
+          <p class="mini-label">How it sits in the roll — tap to set the crop focus</p>
+          <button type="button" class="thumb" onclick={aimFocus} aria-label="Set crop focus">
+            {#key out.url}
+              <DitherImage
+                src={out.url}
+                alt=""
+                cell={grain}
+                levels={tones}
+                {palette}
+                {focus}
+                develop={false}
+                developed={!dither ? true : undefined}
+                eager
+              />
+            {/key}
+            <span class="pin" style="left: {focus[0]}%; top: {focus[1]}%"></span>
+          </button>
+        {/if}
         <div class="seg" role="radiogroup" aria-label="Preview">
           <button type="button" role="radio" aria-checked={view === 'dither'} class:on={view === 'dither'} onclick={() => (view = 'dither')}>
             <Icon name="sparkle" size={15} /> As it shows on the page
@@ -172,6 +239,60 @@
           <span>Date</span>
           <input type="date" bind:value={date} />
         </label>
+
+        <label class="field">
+          <span>Note <small>(optional, shows in the viewer)</small></span>
+          <input bind:value={note} placeholder="Shot on a disposable" maxlength="200" />
+        </label>
+
+        <fieldset class="field look">
+          <legend>Look</legend>
+          <label class="toggle">
+            <input type="checkbox" bind:checked={dither} />
+            <span>Dither it on the page</span>
+          </label>
+          <label class="field" class:dim={!dither}>
+            <span>Grain <output>{grain}px</output></span>
+            <input type="range" min="1" max="8" step="1" bind:value={grain} disabled={!dither} />
+          </label>
+          <div class="seg" class:dim={!dither}>
+            <button type="button" class:on={tones === 2} onclick={() => (tones = 2)} disabled={!dither}>1-bit</button>
+            <button type="button" class:on={tones === 3} onclick={() => (tones = 3)} disabled={!dither}>3-tone</button>
+          </div>
+          <div class="swatches" class:dim={!dither} role="radiogroup" aria-label="Palette">
+            {#each PALETTES as p (p)}
+              <button
+                type="button"
+                role="radio"
+                aria-checked={paletteName === p}
+                aria-label={p}
+                class="sw"
+                class:on={paletteName === p}
+                style="--a: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-dark); --b: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-mid); --c: var(--{p === 'theme' ? 'dither' : `pal-${p}`}-light)"
+                disabled={!dither}
+                onclick={() => (paletteName = p)}
+              ></button>
+            {/each}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={paletteName === 'custom'}
+              class="sw custom"
+              class:on={paletteName === 'custom'}
+              style="--a: {customPal[0]}; --b: {customPal[1]}; --c: {customPal[2]}"
+              disabled={!dither}
+              onclick={() => (paletteName = 'custom')}
+              aria-label="Custom"
+            ></button>
+          </div>
+          {#if paletteName === 'custom'}
+            <div class="pickers">
+              {#each ['Shadows', 'Mids', 'Highlights'] as label, i (label)}
+                <label><input type="color" bind:value={customPal[i]} /> {label}</label>
+              {/each}
+            </div>
+          {/if}
+        </fieldset>
 
         <fieldset class="field">
           <legend>Upscale</legend>
@@ -220,11 +341,18 @@
               <Icon name="download" size={18} stroke={2} /> Save photo
             </button>
           </li>
+          {#if hasLook}
+            <li>
+              <button type="button" class="btn press" onclick={saveLook}>
+                <Icon name="download" size={18} stroke={2} /> Save look ({lookName})
+              </button>
+            </li>
+          {/if}
           <li>
             <a class="btn press" href={UPLOAD_URL} target="_blank" rel="noopener">
               <Icon name="upload" size={18} stroke={2} /> Upload to the roll on GitHub
             </a>
-            <span class="note">Drop the saved file there and commit. The page rebuilds itself in about a minute.</span>
+            <span class="note">Drop the saved file{hasLook ? 's' : ''} there and commit. The page rebuilds itself in about a minute.</span>
           </li>
         </ol>
 
@@ -500,5 +628,91 @@
     color: var(--color-ink-dim);
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .mini-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-micro);
+    color: var(--color-ink-faint);
+  }
+
+  .thumb {
+    position: relative;
+    width: min(220px, 60%);
+    aspect-ratio: 4 / 5;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  .pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    border: 2px solid var(--dither-light);
+    box-shadow: 0 0 0 2px oklch(0 0 0 / 0.5);
+    pointer-events: none;
+    transition-property: left, top;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .look {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .dim {
+    opacity: 0.4;
+  }
+
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sw {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: conic-gradient(var(--a) 0 33%, var(--b) 0 66%, var(--c) 0);
+    box-shadow: 0 0 0 1px var(--color-line-strong);
+    transition-property: scale, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .sw.on {
+    scale: 1.15;
+    box-shadow: 0 0 0 2px var(--color-accent);
+  }
+
+  .sw.custom {
+    outline: 1px dashed var(--color-ink-faint);
+    outline-offset: 2px;
+  }
+
+  .pickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    font-size: var(--t-small);
+  }
+
+  .pickers label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pickers input {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
   }
 </style>

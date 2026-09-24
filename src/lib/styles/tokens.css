@@ -11,6 +11,26 @@
   --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --font-poster: 'Anton', Impact, sans-serif;
 
+  /* Roll palettes (dark → mid → light), picked per photo. */
+  --pal-mono-dark: #0a0a0a;
+  --pal-mono-mid: #7a7a7a;
+  --pal-mono-light: #f2f2f2;
+  --pal-ember-dark: #140604;
+  --pal-ember-mid: #c2410c;
+  --pal-ember-light: #fde68a;
+  --pal-ocean-dark: #04121f;
+  --pal-ocean-mid: #1d4ed8;
+  --pal-ocean-light: #a5f3fc;
+  --pal-mint-dark: #06140f;
+  --pal-mint-mid: #0f766e;
+  --pal-mint-light: #d1fae5;
+  --pal-sepia-dark: #1f140b;
+  --pal-sepia-mid: #8b6b47;
+  --pal-sepia-light: #f3e7d3;
+  --pal-rose-dark: #1a0710;
+  --pal-rose-mid: #be185d;
+  --pal-rose-light: #fce7f3;
+
   --t-micro: 0.6875rem;
   --t-meta: 0.75rem;
   --t-small: 0.8125rem;
