@@ -22,6 +22,9 @@
   /** 1 = next record rises from below; -1 = previous drops from above. */
   let dir = $state<1 | -1>(1);
   let ghostTimer = 0;
+  /** Button flips scroll the rack themselves; ignore scroll-snapping until that settles. */
+  let settling = false;
+  let settleTimer = 0;
 
   const record = $derived(crate.tracks[active]);
   const sleeve = (art: string, size: number) => art.replace(/\d+x\d+bb/, `${size}x${size}bb`);
@@ -56,7 +59,20 @@
         nearest = i;
       }
     }
-    if (nearest !== active) pick(nearest, false);
+    if (!settling && nearest !== active) pick(nearest, false);
+  }
+
+  function armSettle(): void {
+    settling = true;
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(releaseSettle, 700);
+  }
+
+  function releaseSettle(): void {
+    if (!settling) return;
+    settling = false;
+    window.clearTimeout(settleTimer);
+    schedule();
   }
 
   function schedule(): void {
@@ -85,7 +101,10 @@
     }
     if (scroll) {
       const el = rack.children[i] as HTMLElement | undefined;
-      if (el) rack.scrollTo({ left: el.offsetLeft + el.offsetWidth / 2 - rack.clientWidth / 2, behavior: 'smooth' });
+      if (el) {
+        armSettle();
+        rack.scrollTo({ left: el.offsetLeft + el.offsetWidth / 2 - rack.clientWidth / 2, behavior: 'smooth' });
+      }
     }
   }
 
@@ -130,6 +149,7 @@
       ro.disconnect();
       cancelAnimationFrame(raf);
       window.clearTimeout(ghostTimer);
+      window.clearTimeout(settleTimer);
       audio?.pause();
     };
   });
@@ -141,6 +161,7 @@
     class="rack"
     bind:this={rack}
     onscroll={schedule}
+    onscrollend={releaseSettle}
     onkeydown={onKey}
     tabindex="0"
     role="listbox"
@@ -158,8 +179,10 @@
         tabindex="-1"
         onclick={() => (i === active ? toggle() : pick(i))}
       >
-        <img src={sleeve(t.artwork, 600)} alt="{t.album} by {t.artist}" loading="eager" decoding="async" />
-        <span class="shine" aria-hidden="true"></span>
+        <span class="board">
+          <img src={sleeve(t.artwork, 600)} alt="{t.album} by {t.artist}" loading="eager" decoding="async" />
+          <span class="shine" aria-hidden="true"></span>
+        </span>
       </button>
     {/each}
   </div>
@@ -301,9 +324,18 @@
     flex: none;
     width: var(--size);
     aspect-ratio: 1;
-    /* Records tuck behind each other like they would in a crate. */
+    /* Records tuck behind each other. Outer edges stay flush so the
+       end padding can still center the first and last sleeve. */
     margin-inline: calc(var(--size) * -0.18);
     scroll-snap-align: center;
+  }
+
+  /* Tilt lives on the inner board. Transforming the snap target itself
+     makes the browser drop later snap points. */
+  .board {
+    position: absolute;
+    inset: 0;
+    display: block;
     border-radius: 4px;
     transform: translateX(var(--shift)) translateZ(var(--z)) rotateY(var(--rot));
     transform-style: preserve-3d;
@@ -311,6 +343,14 @@
     box-shadow:
       0 0 0 1px oklch(1 0 0 / 0.06),
       0 18px 30px -12px oklch(0 0 0 / 0.8);
+  }
+
+  .sleeve:first-child {
+    margin-left: 0;
+  }
+
+  .sleeve:last-child {
+    margin-right: 0;
   }
 
   .sleeve img {
@@ -331,7 +371,7 @@
     pointer-events: none;
   }
 
-  .sleeve.on {
+  .sleeve.on .board {
     box-shadow:
       0 0 0 1px oklch(1 0 0 / 0.12),
       0 28px 50px -14px oklch(0 0 0 / 0.9);
