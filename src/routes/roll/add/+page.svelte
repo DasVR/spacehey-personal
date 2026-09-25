@@ -5,8 +5,12 @@
   import { app } from '$lib/app.svelte.ts';
   import { identity } from '$lib/data/profile';
   import { PALETTES, rollFileName, type PaletteName, type RollLook } from '$lib/roll-name';
+  import { canPickRollFolder, forgetRollFolder, pickRollFolder, savedRollFolder, writeRollFiles } from '$lib/utils/roll-folder';
+  import { blobToBase64, publishToGithub, RollSendError, tokenCanReadRoll } from '$lib/utils/roll-send';
   import { formatBytes, prepPhoto, type Upscale } from '$lib/utils/photo';
   import { pageHref } from '$lib/utils/urls';
+
+  const TOKEN_KEY = 'roll-github-token';
 
   /** Where the roll lives in the repo; GitHub's uploader drops files straight in. */
   const UPLOAD_URL = 'https://github.com/DasVR/spacehey-personal/upload/main/src/lib/roll';
@@ -52,16 +56,6 @@
   });
   const hasLook = $derived(Object.keys(look).length > 0);
 
-  function saveLook(): void {
-    const blob = new Blob([JSON.stringify(look, null, 2) + '\n'], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = lookName;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    app.say('Look saved — upload it next to the photo');
-  }
-
   /** Tap the preview to set where the square crop centres. */
   function aimFocus(event: MouseEvent): void {
     const r = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -69,6 +63,25 @@
   }
 
   let out = $state<{ url: string; blob: Blob; width: number; height: number } | null>(null);
+
+  type Sink = 'dev' | 'folder' | 'github' | 'none';
+  let sink = $state<Sink>('none');
+  let folderName = $state('');
+  let sending = $state(false);
+  let connectOpen = $state(false);
+  let tokenDraft = $state('');
+  let folderHandle: FileSystemDirectoryHandle | null = null;
+  const canPickFolder = canPickRollFolder();
+
+  const sinkHint = $derived(
+    sink === 'dev'
+      ? 'Writes the photo and its look straight into the roll folder on this computer.'
+      : sink === 'folder'
+        ? `Writes both files into ${folderName}.`
+        : sink === 'github'
+          ? 'Photo and look go up together. The page rebuilds in about a minute.'
+          : 'One tap, once this browser can reach the roll.',
+  );
 
   const ext = $derived(format === 'image/webp' ? 'webp' : 'jpg');
   const name = $derived(rollFileName(date, caption || 'untitled', ext));
@@ -81,7 +94,139 @@
     } catch {
       /* private mode */
     }
+    void detectSink();
   });
+
+  async function detectSink(): Promise<void> {
+    if (import.meta.env.DEV) {
+      try {
+        const res = await fetch('/roll/save');
+        if (res.ok) {
+          sink = 'dev';
+          return;
+        }
+      } catch {
+        /* the dev saver is not running */
+      }
+    }
+    const dir = await savedRollFolder(false);
+    if (dir) {
+      folderHandle = dir;
+      folderName = dir.name;
+      sink = 'folder';
+      return;
+    }
+    try {
+      if (localStorage.getItem(TOKEN_KEY)) sink = 'github';
+    } catch {
+      /* private mode */
+    }
+  }
+
+  function lookText(): string | undefined {
+    return hasLook ? JSON.stringify(look, null, 2) + '\n' : undefined;
+  }
+
+  function rollFiles(): { name: string; blob: Blob }[] {
+    if (!out) return [];
+    const files = [{ name, blob: out.blob }];
+    const text = lookText();
+    if (text) files.push({ name: lookName, blob: new Blob([text], { type: 'application/json' }) });
+    return files;
+  }
+
+  async function sendToRoll(): Promise<void> {
+    if (!out || busy || sending) return;
+    if (sink === 'none') {
+      connectOpen = true;
+      return;
+    }
+    sending = true;
+    try {
+      if (sink === 'dev') {
+        const res = await fetch('/roll/save', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            photoName: name,
+            photo: await blobToBase64(out.blob),
+            lookName: hasLook ? lookName : undefined,
+            look: lookText(),
+          }),
+        });
+        if (!res.ok) throw new RollSendError('Couldn’t write that photo');
+        app.say('It’s in the roll folder');
+      } else if (sink === 'folder') {
+        const dir = folderHandle ?? (await savedRollFolder(true));
+        if (!dir) throw new RollSendError('Pick the roll folder again');
+        folderHandle = dir;
+        await writeRollFiles(dir, rollFiles());
+        app.say('It’s in the roll folder');
+      } else {
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+          sink = 'none';
+          connectOpen = true;
+          return;
+        }
+        await publishToGithub(token, {
+          photoName: name,
+          photoBase64: await blobToBase64(out.blob),
+          lookName: hasLook ? lookName : undefined,
+          lookText: lookText(),
+        });
+        app.say('Sent — it shows up after the rebuild');
+      }
+    } catch (error) {
+      app.say(error instanceof RollSendError ? error.message : 'Couldn’t send that photo');
+    } finally {
+      sending = false;
+    }
+  }
+
+  async function connectGithub(): Promise<void> {
+    const token = tokenDraft.trim();
+    if (!token) return;
+    sending = true;
+    try {
+      await tokenCanReadRoll(token);
+      localStorage.setItem(TOKEN_KEY, token);
+      tokenDraft = '';
+      sink = 'github';
+      connectOpen = false;
+      app.say('GitHub is connected');
+    } catch (error) {
+      app.say(error instanceof RollSendError ? error.message : 'Couldn’t connect');
+    } finally {
+      sending = false;
+    }
+  }
+
+  async function connectFolder(): Promise<void> {
+    try {
+      const dir = await pickRollFolder();
+      folderHandle = dir;
+      folderName = dir.name;
+      sink = 'folder';
+      connectOpen = false;
+      app.say(`Using ${dir.name}`);
+    } catch {
+      /* picker dismissed */
+    }
+  }
+
+  async function disconnect(): Promise<void> {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      /* private mode */
+    }
+    await forgetRollFolder();
+    folderHandle = null;
+    folderName = '';
+    sink = 'none';
+    connectOpen = true;
+  }
 
   async function take(file: File | undefined): Promise<void> {
     if (!file || !file.type.startsWith('image/')) {
@@ -125,27 +270,34 @@
     };
   });
 
-  function download(): void {
-    if (!out) return;
+  function saveFile(href: string, fileName: string): void {
     const a = document.createElement('a');
-    a.href = out.url;
-    a.download = name;
+    a.href = href;
+    a.download = fileName;
     a.click();
-    app.say('Saved — now drop it into GitHub');
   }
 
-  async function share(): Promise<void> {
+  /** Share or download the photo and its look together, for a hand upload. */
+  async function downloadBoth(): Promise<void> {
     if (!out) return;
-    const file = new File([out.blob], name, { type: format });
-    if (navigator.canShare?.({ files: [file] })) {
+    const text = lookText();
+    const photo = new File([out.blob], name, { type: format });
+    const files = text ? [photo, new File([text], lookName, { type: 'application/json' })] : [photo];
+    if (navigator.canShare?.({ files })) {
       try {
-        await navigator.share({ files: [file], title: name });
+        await navigator.share({ files, title: name });
+        return;
       } catch {
-        /* dismissed */
+        return;
       }
-    } else {
-      download();
     }
+    saveFile(out.url, name);
+    if (text) {
+      const url = URL.createObjectURL(files[1]);
+      saveFile(url, lookName);
+      URL.revokeObjectURL(url);
+    }
+    app.say(text ? 'Saved both — drop them into GitHub' : 'Saved — now drop it into GitHub');
   }
 </script>
 
@@ -158,7 +310,7 @@
   <header>
     <a class="back" href={pageHref('/')}><Icon name="chevron-left" size={16} /> Back to the card</a>
     <h1>Add to the roll</h1>
-    <p class="lead">Drop a photo, tune it, and it lands on the page after one upload. Location data is stripped on the way.</p>
+    <p class="lead">Drop a photo, tune it, and send it to the roll in one tap. Location data is stripped on the way.</p>
   </header>
 
   {#if !source}
@@ -335,26 +487,48 @@
         </p>
         <p class="file"><Icon name="image" size={14} /> {name}</p>
 
-        <ol class="steps">
-          <li>
-            <button type="button" class="btn primary press" onclick={share} disabled={!out || busy}>
-              <Icon name="download" size={18} stroke={2} /> Save photo
-            </button>
-          </li>
-          {#if hasLook}
-            <li>
-              <button type="button" class="btn press" onclick={saveLook}>
-                <Icon name="download" size={18} stroke={2} /> Save look ({lookName})
-              </button>
-            </li>
+        <div class="send">
+          <button type="button" class="btn primary press" onclick={sendToRoll} disabled={!out || busy || sending}>
+            <Icon name="upload" size={18} stroke={2} /> {sending ? 'Sending…' : 'Send to the roll'}
+          </button>
+          <p class="note">{sinkHint}</p>
+
+          {#if sink !== 'none' && sink !== 'dev'}
+            <button type="button" class="reset" onclick={disconnect}>Use a different destination</button>
           {/if}
-          <li>
+
+          {#if connectOpen && sink === 'none'}
+            <div class="connect">
+              <label class="field">
+                <span>GitHub token</span>
+                <input type="password" bind:value={tokenDraft} autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
+              </label>
+              <button type="button" class="btn press" onclick={connectGithub} disabled={!tokenDraft.trim() || sending}>
+                Save token on this device
+              </button>
+              <p class="note">
+                A fine-grained token for DasVR/spacehey-personal, Contents read and write. It stays in this browser and only adds files in the roll folder.
+                <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create one</a>
+              </p>
+              {#if canPickFolder}
+                <button type="button" class="btn press" onclick={connectFolder}>
+                  <Icon name="image" size={18} /> Use the roll folder on this computer
+                </button>
+              {/if}
+            </div>
+          {/if}
+
+          <details class="manual">
+            <summary>Download and upload by hand</summary>
+            <button type="button" class="btn press" onclick={downloadBoth} disabled={!out || busy}>
+              <Icon name="download" size={18} stroke={2} /> {hasLook ? 'Save photo and look' : 'Save photo'}
+            </button>
             <a class="btn press" href={UPLOAD_URL} target="_blank" rel="noopener">
-              <Icon name="upload" size={18} stroke={2} /> Upload to the roll on GitHub
+              <Icon name="github" size={18} /> Open the roll on GitHub
             </a>
-            <span class="note">Drop the saved file{hasLook ? 's' : ''} there and commit. The page rebuilds itself in about a minute.</span>
-          </li>
-        </ol>
+            <span class="note">Drop the saved file{hasLook ? 's' : ''} there and commit.</span>
+          </details>
+        </div>
 
         <button type="button" class="reset" onclick={() => (source = null)}>Start over with another photo</button>
       </form>
@@ -578,15 +752,26 @@
     word-break: break-all;
   }
 
-  .steps {
+  .send,
+  .connect,
+  .manual {
     display: grid;
     gap: var(--s-3);
-    list-style: none;
   }
 
-  .steps li {
-    display: grid;
-    gap: 6px;
+  .manual {
+    padding-top: var(--s-2);
+  }
+
+  .manual summary {
+    min-height: 44px;
+    font-size: var(--t-small);
+    color: var(--color-ink-dim);
+    cursor: pointer;
+  }
+
+  .note a {
+    color: var(--color-ink);
   }
 
   .btn {

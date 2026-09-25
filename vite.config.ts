@@ -1,8 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { rollSavePlugin } from './vite.roll-save';
 
 export default defineConfig({
-  plugins: [sveltekit()],
+  plugins: [rollSavePlugin(), sveltekit()],
   define: {
     // Absolute origin for share embeds (Discord, iMessage, X need full URLs).
     // Origin + base path, e.g. https://dasvr.github.io/spacehey-personal.
