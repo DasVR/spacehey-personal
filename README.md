@@ -84,8 +84,9 @@ All copy is in `src/lib/data/profile.ts` (`identity`, `casual`, `pro`).
   Apple Music link. Put the playlist's share link in `appleMusicUrl`.
 - **Roll:** drop photos into `src/lib/roll/` named
   `YYYY-MM-DD--a-caption.jpg`, or use **`/roll/add/`** on the site: it
-  upscales or resizes, sharpens, strips location data, previews the dither
-  and opens GitHub's uploader for that folder.
+  upscales or resizes, sharpens, strips location data, previews the dither,
+  and sends the photo and its look to the roll in one tap (the dev server,
+  a folder you pick, or a GitHub token kept on that device).
 - **Top 8:** give a friend `social: { platform, handle }` and their real
   profile picture is pulled in (Instagram, X, GitHub, TikTok, Bluesky,
   YouTube, Twitch). Without it they get a colour tile.

@@ -6,8 +6,11 @@ Drop photos here and they show up on the page — no code to touch.
   (newest first) and the rest becomes the caption: dashes turn into spaces.
 - **Formats:** `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`.
 - **Easiest way:** open `/roll/add/` on the site. It resizes or upscales
-  the photo, strips location data, previews the dither, names the file for
-  you and opens GitHub's upload page for this folder.
+  the photo, strips location data, previews the dither, names the file,
+  and **Send to the roll** writes the photo and its look together — into
+  this folder while `npm run dev` is running, into a folder you pick, or
+  up to GitHub with a token that stays on that device. Downloading and
+  uploading by hand is still there if you want it.
 
 ## Per-photo look (optional)
 
