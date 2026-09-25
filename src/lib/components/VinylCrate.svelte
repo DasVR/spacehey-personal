@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
-  import type { Crate } from '$lib/data/types';
+  import type { Crate, Record } from '$lib/data/types';
 
   interface Props {
     crate: Crate;
@@ -15,6 +15,13 @@
   let playing = $state(false);
   let progress = $state(0);
   let raf = 0;
+  /** The sleeve you just left, held long enough to play out. */
+  let ghost = $state<Record | null>(null);
+  /** False until the first flip, so the opening title doesn't animate in. */
+  let moved = $state(false);
+  /** 1 = next record rises from below; -1 = previous drops from above. */
+  let dir = $state<1 | -1>(1);
+  let ghostTimer = 0;
 
   const record = $derived(crate.tracks[active]);
   const sleeve = (art: string, size: number) => art.replace(/\d+x\d+bb/, `${size}x${size}bb`);
@@ -59,6 +66,13 @@
   function pick(i: number, scroll = true): void {
     const wasPlaying = playing;
     if (i !== active) {
+      dir = i > active ? 1 : -1;
+      ghost = record;
+      moved = true;
+      window.clearTimeout(ghostTimer);
+      ghostTimer = window.setTimeout(() => {
+        ghost = null;
+      }, 440);
       active = i;
       progress = 0;
       if (audio) {
@@ -75,8 +89,8 @@
     }
   }
 
-  function step(dir: 1 | -1): void {
-    pick(Math.max(0, Math.min(crate.tracks.length - 1, active + dir)));
+  function step(delta: 1 | -1): void {
+    pick(Math.max(0, Math.min(crate.tracks.length - 1, active + delta)));
   }
 
   async function toggle(): Promise<void> {
@@ -115,6 +129,7 @@
     return () => {
       ro.disconnect();
       cancelAnimationFrame(raf);
+      window.clearTimeout(ghostTimer);
       audio?.pause();
     };
   });
@@ -154,17 +169,46 @@
       <!-- The record slides out of its sleeve and spins while the preview plays. -->
       <div class="disc" style="--p: {progress}">
         <span class="grooves"></span>
-        <img class="label" src={sleeve(record.artwork, 300)} alt="" />
+        {#if ghost}
+          <img class="label out" src={sleeve(ghost.artwork, 300)} alt="" />
+        {/if}
+        {#key record.id}
+          <img class="label" class:in={moved} src={sleeve(record.artwork, 300)} alt="" />
+        {/key}
         <span class="spindle"></span>
       </div>
-      <img class="cover" src={sleeve(record.artwork, 600)} alt="" />
+      {#if ghost}
+        <img class="cover out" src={sleeve(ghost.artwork, 600)} alt="" />
+      {/if}
+      {#key record.id}
+        <img class="cover" class:in={moved} src={sleeve(record.artwork, 600)} alt="" />
+      {/key}
     </div>
 
     <div class="info">
-      <p class="kicker"><span class="bars" class:live={playing} aria-hidden="true"><i></i><i></i><i></i></span>{String(active + 1).padStart(2, '0')} / {String(crate.tracks.length).padStart(2, '0')}</p>
-      <h3>{record.title}</h3>
-      <p class="by">{record.artist}</p>
-      <p class="meta">{albumName(record.album)} · {record.year} · {record.genre}</p>
+      <p class="kicker">
+        <span class="bars" class:live={playing} aria-hidden="true"><i></i><i></i><i></i></span>
+        {#key active}
+          <span class="idx" class:in={moved} class:back={dir === -1}>{String(active + 1).padStart(2, '0')}</span>
+        {/key}
+        / {String(crate.tracks.length).padStart(2, '0')}
+      </p>
+      <div class="titles" aria-live="polite">
+        {#if ghost}
+          <div class="sheet out" class:back={dir === -1} aria-hidden="true">
+            <p class="title">{ghost.title}</p>
+            <p class="by">{ghost.artist}</p>
+            <p class="meta">{albumName(ghost.album)} · {ghost.year} · {ghost.genre}</p>
+          </div>
+        {/if}
+        {#key record.id}
+          <div class="sheet" class:in={moved} class:back={dir === -1}>
+            <h3>{record.title}</h3>
+            <p class="by">{record.artist}</p>
+            <p class="meta">{albumName(record.album)} · {record.year} · {record.genre}</p>
+          </div>
+        {/key}
+      </div>
 
       <div class="controls">
         <button type="button" class="nav press" onclick={() => step(-1)} disabled={active === 0} aria-label="Previous record">
@@ -358,8 +402,20 @@
     object-fit: cover;
   }
 
+  .cover.in,
+  .label.in {
+    z-index: 1;
+    animation: art-in 420ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .cover.out,
+  .label.out {
+    animation: art-out 320ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
   .spindle {
     position: absolute;
+    z-index: 2;
     top: 50%;
     left: 50%;
     width: 5px;
@@ -414,8 +470,80 @@
     animation-delay: -600ms;
   }
 
-  h3 {
+  .titles {
+    display: grid;
     margin-top: 4px;
+    min-width: 0;
+    overflow: clip;
+  }
+
+  .sheet {
+    display: grid;
+    grid-area: 1 / 1;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .sheet.out {
+    pointer-events: none;
+  }
+
+  .sheet.in {
+    z-index: 1;
+  }
+
+  .sheet.in,
+  .sheet.out,
+  .idx.in {
+    --rise: 12px;
+  }
+
+  .sheet.back,
+  .idx.back {
+    --rise: -12px;
+  }
+
+  .sheet.in h3,
+  .sheet.in .by,
+  .sheet.in .meta,
+  .sheet.out .title,
+  .sheet.out .by,
+  .sheet.out .meta,
+  .idx.in {
+    animation-duration: 420ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    animation-fill-mode: both;
+  }
+
+  .sheet.in h3,
+  .sheet.in .by,
+  .sheet.in .meta,
+  .idx.in {
+    animation-name: title-in;
+  }
+
+  .sheet.in .by {
+    animation-delay: 45ms;
+  }
+
+  .sheet.in .meta {
+    animation-delay: 90ms;
+  }
+
+  .sheet.out .title,
+  .sheet.out .by,
+  .sheet.out .meta {
+    animation-name: title-out;
+    animation-duration: 260ms;
+  }
+
+  .idx.in {
+    display: inline-block;
+    animation-duration: 320ms;
+  }
+
+  h3,
+  .title {
     font-size: var(--t-title);
     font-weight: 600;
     line-height: 1.15;
@@ -537,10 +665,59 @@
     }
   }
 
+  @keyframes title-in {
+    from {
+      opacity: 0;
+      filter: blur(4px);
+      translate: 0 var(--rise);
+    }
+  }
+
+  @keyframes title-out {
+    to {
+      opacity: 0;
+      filter: blur(4px);
+      translate: 0 calc(var(--rise) * -1);
+    }
+  }
+
+  @keyframes art-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes art-out {
+    to {
+      opacity: 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .disc,
     .bars.live i {
       animation: none;
+    }
+
+    .sheet.in h3,
+    .sheet.in .by,
+    .sheet.in .meta,
+    .idx.in,
+    .cover.in,
+    .label.in {
+      animation-name: art-in;
+      animation-duration: 200ms;
+      filter: none;
+    }
+
+    .sheet.out .title,
+    .sheet.out .by,
+    .sheet.out .meta,
+    .cover.out,
+    .label.out {
+      animation-name: art-out;
+      animation-duration: 160ms;
+      filter: none;
     }
   }
 </style>
